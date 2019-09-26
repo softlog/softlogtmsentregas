@@ -1,0 +1,186 @@
+package br.eti.softlog.softlogtmsentregas;
+
+import android.content.Context;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import br.eti.softlog.model.Veiculo;
+
+/**
+ * Created by Paulo Sérgio Alves on 2018/03/23.
+ */
+
+public class ExtractRomaneioJson {
+
+    EntregasApp app;
+    Manager manager;
+    private Context mContext;
+
+    public ExtractRomaneioJson (Context context){
+        mContext = context;
+        app = (EntregasApp) context.getApplicationContext();
+        manager = new Manager(app);
+    }
+
+    public void extract(String response){
+
+
+        try {
+            //Log.d("Response",response);
+            //Log.d("Extraindo Dados","Romaneios");
+            JSONObject jObj = new JSONObject(response);
+
+            //Gravando Cidades
+            JSONArray cidades = jObj.getJSONArray("cidades");
+
+            for(int i = 0;i<cidades.length();i++){
+                JSONObject cidade = cidades.getJSONObject(i);
+                Long idCidade = cidade.getLong("id_cidade");
+                String nomeCidade = cidade.getString("nome_cidade");
+                String uf = cidade.getString("uf");
+                String cod_ibge = cidade.getString("cod_ibge");
+                manager.addCidade(idCidade,nomeCidade,uf,cod_ibge);
+            }
+
+            //Gravando Pessoas
+            JSONArray pessoas = jObj.getJSONArray("pessoas");
+
+            for(int i = 0;i<pessoas.length(); i++){
+                JSONObject pessoa = pessoas.getJSONObject(i);
+
+                String cnpjCpf = pessoa.getString("cnpj_cpf");
+                String nome = pessoa.getString("nome");
+                String endereco = pessoa.getString("endereco");
+                String numero = pessoa.getString("numero");
+                String bairro = pessoa.getString("bairro");
+                Long idCidade = pessoa.getLong("id_cidade");
+                String cep = pessoa.getString("cep");
+                String telefone = pessoa.getString("telefone");
+                String latitude = pessoa.getString("latitude");
+                String longitude = pessoa.getString("longitude");
+                Long id = Long.valueOf(cnpjCpf);
+                int tipoPessoa;
+                if (cnpjCpf.length()==14)
+                    tipoPessoa = 2;
+                else
+                    tipoPessoa = 1;
+
+                manager.addPessoa(id,tipoPessoa,nome,cnpjCpf,endereco,numero,
+                        bairro, idCidade,cep,telefone,null,
+                        null,latitude,longitude);
+            }
+
+            //Gravando Veiculos
+            JSONArray veiculos = jObj.getJSONArray("veiculo");
+
+            for(int i = 0; i<veiculos.length();i++) {
+
+                JSONObject veiculo = veiculos.getJSONObject(i);
+
+                String placa = veiculo.getString("placa_veiculo");
+                String descricao = veiculo.getString("descricao");
+
+                manager.addVeiculo(placa,descricao);
+            }
+
+            //Gravando Romaneios
+            JSONArray romaneios = jObj.getJSONArray("romaneios");
+            for(int i = 0; i<romaneios.length();i++){
+
+                JSONObject romaneio = romaneios.getJSONObject(i);
+
+                Long idRomaneio = romaneio.getLong("id_romaneio");
+                String numeroRomaneio = romaneio.getString("numero_romaneio");
+                String dataRomaneio = romaneio.getString("data_romaneio");
+                String dataSaida = romaneio.getString("data_saida");
+                String dataChegada = romaneio.getString("data_chegada");
+                String dataExpedicaoRomaneio = romaneio.getString("data_expedicao");
+                String placaVeiculo = romaneio.getString("placa_veiculo");
+                String motoristaCpf = romaneio.getString("motorista_cpf");
+                String redespachadorCnpj = romaneio.getString("redespachador_cpf");
+                Long cidadeOrigemId = romaneio.getLong("id_origem");
+
+                Long longRedespachadorCnpj;
+                if (redespachadorCnpj == "null")
+                    longRedespachadorCnpj = null;
+                else
+                    longRedespachadorCnpj = Long.valueOf(redespachadorCnpj);
+
+                Veiculo veiculoRomaneio = manager.findVeiculoByPlaca(placaVeiculo);
+                Long idVeiculo;
+                if (veiculoRomaneio == null)
+                    idVeiculo = null;
+                else
+                    idVeiculo = veiculoRomaneio.getId();
+
+                manager.addRomaneio(idRomaneio,numeroRomaneio,dataRomaneio,dataSaida,
+                        dataChegada,idVeiculo,Long.valueOf(motoristaCpf),
+                        longRedespachadorCnpj,cidadeOrigemId,
+                        null,false, dataExpedicaoRomaneio);
+
+                //Gravando Documentos
+                JSONArray documentos = romaneio.getJSONArray("documentos");
+
+                for(int j = 0; j<documentos.length();j++){
+                    JSONObject documento = documentos.getJSONObject(j);
+                    Long idNotaFiscalImp;
+                    try {
+                        idNotaFiscalImp = documento.getLong("id_nota_fiscal_imp");
+                    } catch (JSONException e) {
+                        idNotaFiscalImp = null;
+                    }
+
+                    String dataEmissao = documento.getString("data_emissao");
+                    String dataExpedicao = documento.getString("data_expedicao");
+                    String chaveNfe = documento.getString("chave_nfe");
+                    String serie = documento.getString("serie");
+                    String numeroNotaFiscal = documento.getString("numero_nota_fiscal");
+                    Long remetenteCnpj = documento.getLong("remetente_cnpj");
+                    Long destinatarioCnpj = documento.getLong("destinatario_cnpj");
+                    Long romaneioId = documento.getLong("id_romaneio");
+                    Double valor = documento.getDouble("valor");
+                    Double peso = documento.getDouble("peso");
+                    Double volumes = documento.getDouble("volume");
+                    Long idOcorrencia = documento.getLong("id_ocorrencia");
+                    String dataOcorrencia1 = documento.getString("data_ocorrencia");
+                    String dataOcorrencia;
+
+                    Long idConhecimentoNotasFiscais;
+                    Long idConhecimento;
+
+                    try {
+                        idConhecimentoNotasFiscais = documento.getLong("id_conhecimento_notas_fiscais");
+                    } catch (JSONException e) {
+                        idConhecimentoNotasFiscais = null;
+                    }
+
+                    try {
+                        idConhecimento = documento.getLong("id_conhecimento");
+                    } catch (JSONException e) {
+                        idConhecimento = null;
+                    }
+
+                    if (dataOcorrencia1=="null"){
+                        dataOcorrencia = null;
+                    } else {
+                        dataOcorrencia = dataOcorrencia1;
+                    }
+
+                    manager.addDocumento(idNotaFiscalImp,dataEmissao,dataExpedicao,
+                            chaveNfe,serie,numeroNotaFiscal,remetenteCnpj,
+                            destinatarioCnpj,romaneioId,valor,peso,volumes,
+                            idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
+                            idConhecimento, 0.0, 0.0);
+
+                }
+            }
+
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+}

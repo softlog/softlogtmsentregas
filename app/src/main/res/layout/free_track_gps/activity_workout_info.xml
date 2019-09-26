@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" android:textAlignment="center">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/nameWorkoutTextView" android:layout_y="53dp"
+            android:gravity="center"
+            android:text="@string/Unnamend" android:layout_x="0dp" android:textAlignment="center"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workoutDistanceLabel"
+            android:id="@+id/distanceLabel" android:layout_x="68dp" android:layout_y="105dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/distanceText" android:layout_x="180dp" android:layout_y="105dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/startTimeLabel"
+            android:id="@+id/startTimeLabel" android:layout_x="68dp" android:layout_y="134dp"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="0" android:id="@+id/startTimeText" android:layout_x="180dp"
+              android:layout_y="134dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/endTimeLabel"
+            android:id="@+id/endTimeLabel" android:layout_x="68dp" android:layout_y="160dp"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="0" android:id="@+id/endTimeText" android:layout_x="180dp"
+              android:layout_y="160dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Points"
+            android:id="@+id/PointsLabel" android:layout_x="68dp" android:layout_y="186dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/pointsText" android:layout_x="180dp" android:layout_y="186dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/minHeight"
+            android:id="@+id/minHeightLabel" android:layout_x="68dp" android:layout_y="211dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/minHeightText" android:layout_x="180dp" android:layout_y="211dp"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="@string/maxHeight" android:id="@+id/maxHeightLabel"
+              android:layout_x="68dp" android:layout_y="235dp"/>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:text="0" android:id="@+id/maxHeightText" android:layout_x="180dp"
+              android:layout_y="235dp"/>
+</AbsoluteLayout>

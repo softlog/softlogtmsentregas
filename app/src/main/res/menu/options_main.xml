@@ -1,0 +1,38 @@
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/action_workout_mapview"
+            android:orderInCategory="10"
+        android:title="@string/action_workout_mapview" android:menuCategory="system"
+        app:showAsAction="never" />
+
+    <item
+            android:id="@+id/action_ignorepoints_list"
+            android:orderInCategory="100"
+        android:title="@string/action_ignorepoints_list" android:menuCategory="system"
+        app:showAsAction="never" />
+    <item
+            android:id="@+id/action_workouts_list"
+            android:orderInCategory="99"
+        android:title="@string/workoutsListLabel" android:menuCategory="system"
+        app:showAsAction="never" />
+
+    <item
+            android:id="@+id/action_settings"
+            android:orderInCategory="200"
+        android:title="@string/action_settings" android:menuCategory="system"
+        app:showAsAction="never" />
+
+    <item
+            android:id="@+id/action_gpssettings"
+            android:orderInCategory="300"
+        android:title="@string/gpsSetting" android:menuCategory="system"
+        app:showAsAction="never" />
+
+    <item
+            android:id="@+id/action_about"
+            android:orderInCategory="400"
+        android:title="Sobre" android:menuCategory="system"
+        app:showAsAction="never" />
+</menu>

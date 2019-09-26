@@ -1,0 +1,281 @@
+<resources>
+    <string name="app_name">sConfirmei</string>
+    <string name="action_settings">Configurações</string>
+    <string name="exit">Sair</string>
+
+    <string name="usuario">Usuário</string>
+    <string name="hint_usuario">CPF usuário</string>
+    <string name="senha">Senha</string>
+    <string name="hint_senha">Senha</string>
+    <string name="codigo_acesso">Código Acesso</string>
+    <string name="hint_codigo_acesso">Código de Acesso</string>
+    <string name="login">Login</string>
+    <string name="botao_login">Entrar</string>
+
+    <string name="valid_usuario">Login do usuário obrigatório.</string>
+    <string name="valid_senha">Senha obrigatório.</string>
+    <string name="valid_codigo_acesso">Código de Acesso obrigatório.</string>
+    <string name="senha_invalida">Senha do usuário incorreta</string>
+    <string name="usuario_inexistente">Usuário inexistente</string>
+    <string name="erro_acesso">Ocorreu algum problema. Tente novamente.</string>
+    <string name="erro_criar_conta">Não foi possível criar a conta. Tente novamente.</string>
+
+    <string name="descricao_abertura">www.softlog.eti.br</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="search">Busca</string>
+    <string name="refresh">Atualizar</string>
+    <string name="config">Configuração</string>
+
+    <string name="conferidos">Conferidos</string>
+    <string name="n_o_conferidos">Pendentes</string>
+    <string name="data_protocolo">Data Protocolo</string>
+    <string name="todos">Todos</string>
+    <string name="n_mero_protocolo">Número Protocolo</string>
+    <string name="pesquisa">Pesquisa</string>
+    <string name="title_activity_remetente_setor">RemetenteSetorActivity</string>
+    <string name="scanner">Scanner</string>
+
+    <string name="result_image_desc">Resultado da Captura</string>
+
+    <string name="main_drawer_load">Carregar Imagem</string>
+    <string name="main_drawer_open">Abrir barra de navegação</string>
+    <string name="main_drawer_close">Fechar barra de navegação</string>
+
+    <string name="main_action_crop">Cortar</string>
+    <string name="main_action_rotate">Girar 90º Direita</string>
+    <string name="main_action_flip">Flip</string>
+    <string name="main_action_flip_horizontally">Virar Horizontal</string>
+    <string name="main_action_flip_vertically">Virar Vertical</string>
+    <string name="drawer_option_title">Configurações de Corte</string>
+    <string name="drawer_option_oval">Circular</string>
+    <string name="drawer_option_rect">Rectangular</string>
+    <string name="drawer_option_min_max">Min/Max limits override</string>
+    <string name="drawer_option_customized_overlay">Sobreposição personalizada</string>
+    <string name="drawer_option_scale_center">Escala centralizada</string>
+    <string name="drawer_option_title2">Opções de Personalização</string>
+    <string name="drawer_option_toggle_scale">Escala de Imagem: %1s</string>
+    <string name="drawer_option_toggle_shape">Crop Shape: %1s</string>
+    <string name="drawer_option_toggle_guidelines">Guidelines: %1s</string>
+    <string name="drawer_option_toggle_aspect_ratio">Proporção Tela: %1s</string>
+    <string name="drawer_option_toggle_auto_zoom">Auto zoom: %1s</string>
+    <string name="drawer_option_toggle_max_zoom">Max zoom level: %1s</string>
+    <string name="drawer_option_set_initial_crop_rect">Definir o retângulo de recorte inicial</string>
+    <string name="drawer_option_reset_crop_rect">Redefinir o retângulo de recorte inicial</string>
+    <string name="drawer_option_toggle_multitouch">Multitouch: %1s</string>
+    <string name="drawer_option_toggle_show_overlay">Mostrar Sobreposição: %1s</string>
+    <string name="drawer_option_toggle_show_progress_bar">Mostrar Barra Progresso: %1s</string>
+
+    <!--<string name="main_action_crop">Cortar</string>-->
+    <!--<string name="main_action_rotate">Girar 90º Direita</string>-->
+    <!--<string name="main_action_flip">Flip</string>-->
+    <!--<string name="main_action_flip_horizontally">Flip horizontally</string>-->
+    <!--<string name="main_action_flip_vertically">Flip vertically</string>-->
+    <!--<string name="drawer_option_title">Crop View Presets</string>-->
+    <!--<string name="drawer_option_oval">Circular</string>-->
+    <!--<string name="drawer_option_rect">Rectangular</string>-->
+    <!--<string name="drawer_option_min_max">Min/Max limits override</string>-->
+    <!--<string name="drawer_option_customized_overlay">Customized Overlay</string>-->
+    <!--<string name="drawer_option_scale_center">Scale Center Inside</string>-->
+    <!--<string name="drawer_option_title2">Customization Toggles</string>-->
+    <!--<string name="drawer_option_toggle_scale">Image Scale: %1s</string>-->
+    <!--<string name="drawer_option_toggle_shape">Crop Shape: %1s</string>-->
+    <!--<string name="drawer_option_toggle_guidelines">Guidelines: %1s</string>-->
+    <!--<string name="drawer_option_toggle_aspect_ratio">Aspect Ratio: %1s</string>-->
+    <!--<string name="drawer_option_toggle_auto_zoom">Auto zoom: %1s</string>-->
+    <!--<string name="drawer_option_toggle_max_zoom">Max zoom level: %1s</string>-->
+    <!--<string name="drawer_option_set_initial_crop_rect">Set initial crop rectangle</string>-->
+    <!--<string name="drawer_option_reset_crop_rect">Reset crop rectangle to initial</string>-->
+    <!--<string name="drawer_option_toggle_multitouch">Multitouch: %1s</string>-->
+    <!--<string name="drawer_option_toggle_show_overlay">Show Overlay: %1s</string>-->
+    <!--<string name="drawer_option_toggle_show_progress_bar">Show Progress Bar: %1s</string>    -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="action_exit">Sair</string>
+    <string name="action_feedback">Feedback</string>
+    <string name="retry">Tentar Novamente</string>
+    <string name="internet_is_required_to_run_this_app">Internet é requerida para executar este aplicativo</string>
+    <string name="enable_notifications">Habilita Notificações</string>
+    <string name="perf_profile">Seu Perfil</string>
+    <string name="first_name">Primeiro Nome</string>
+    <string name="options">Opções</string>
+    <string name="share">Compartilhar</string>
+    <string name="settings_saved">Configurações Salvas</string>
+    <string name="send_feedback">Enviar Feedback</string>
+    <string name="version">Beta 0.1</string>
+    <string name="about">Sobre</string>
+    <string name="settings">Configurações</string>
+    <string name="dialog_action_ok">OK</string>
+    <string name="generic_error_title">Erro</string>
+    <string name="dialog_general_error_message">Um erro geral aconteceu.</string>
+    <string name="title_activity_maps">Mapa</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+
+    <string name="title_section1">Home</string>
+    <string name="title_section2">History</string>
+    <string name="title_section3">Calibrate</string>
+    <string name="action_example">Example action</string>
+    <!--<string name="action_settings">Settings</string>-->
+    <!--<string name="settings">Settings</string>-->
+    <string name="refresh_markers">Show Latest</string>
+    <string name="calibrate">Calibrate</string>
+    <string name="pref_onoff_title">On/Off</string>
+    <string name="pref_onoff_summary">Turn tracking on/off</string>
+    <string name="pref_interval_title">Tracking Interval</string>
+    <string name="pref_interval_summary">How frequently to track location</string>
+    <string name="pref_timeout_title">GPS Timeout</string>
+    <string name="pref_timeout_summary">If no GPS fix within this, stop polling</string>
+    <string name="pref_threshold_title">Accelerometer Threshold</string>
+    <string name="pref_threshold_summary">To account for accelerometer noise</string>
+
+    <string-array name="pref_intervalLabels">
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>40 seconds</item>
+        <item>50 seconds</item>
+        <item>60 seconds</item>
+        <item>70 seconds</item>
+        <item>80 seconds</item>
+        <item>90 seconds</item>
+    </string-array>
+
+    <string-array name="pref_intervalValues">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+    </string-array>
+
+    <string name="pref_intervalDefault">40</string>
+    <string name="pref_timeoutDefault">20</string>
+    <string name="pref_thresholdDefault">0.30</string>
+
+    <string-array name="pref_thresholdValues">
+        <item>0.05</item>
+        <item>0.10</item>
+        <item>0.15</item>
+        <item>0.20</item>
+        <item>0.25</item>
+        <item>0.30</item>
+        <item>0.35</item>
+        <item>0.40</item>
+        <item>0.45</item>
+        <item>0.50</item>
+        <item>0.55</item>
+        <item>0.60</item>
+        <item>0.65</item>
+        <item>0.70</item>
+        <item>0.75</item>
+        <item>0.80</item>
+        <item>0.85</item>
+        <item>0.90</item>
+        <item>0.95</item>
+    </string-array>
+
+
+    <string name="gpsSetting">Location Settings</string>
+    <string name="gpsStatusLabel">GPS Status</string>
+    <string name="gpsPositionLabel">Position GPS</string>
+    <string name="workoutStatusLabel">Workout status</string>
+    <string name="workoutDistanceLabel">Distance</string>
+    <string name="workoutStartLabel">Start</string>
+    <string name="workoutPauseLabel">Pause</string>
+    <string name="settingGPSSpeedScan">Speed GPS scan</string>
+    <string name="settingDistanceBetweenPointLabel">Distance between points</string>
+    <string name="settingShowWorkoutInfoLabel">Show workout info if stop</string>
+    <string name="offLabel">Off</string>
+    <string name="onLabel">On</string>
+    <string name="pauseLabel">Pause</string>
+    <string name="unPauseLabel">UnPause</string>
+    <string name="startLabel">Start</string>
+    <string name="stopLabel">Stop</string>
+    <string name="activeLabel">Active</string>
+    <string name="aboutProgram">Simple application for saving gps workout to GPX file</string>
+    <string name="versionLabel">version</string>
+    <string name="SaveTrueInfo">Save workout in</string>
+    <string name="SaveFalseInfo">Error save workout in</string>
+    <string name="closeSettingsInfo">Restart application for apply changes</string>
+    <string name="finishApp">Close FreeTrackGPS</string>
+    <string name="finishAppInfo">Do you want close application?</string>
+    <string name="NotificationLabel">Show notification workout</string>
+    <string name="workoutsListLabel">Workouts list</string>
+    <string name="workoutDeleteLabel">delete</string>
+    <string name="workoutExportLabel">export</string>
+    <string name="workoutsFilterByDate">Filter by date</string>
+    <string name="okLabel">Ok</string>
+    <string name="cancelLabel">Cancel</string>
+    <string name="setFilterLabel">Set filter for workouts</string>
+    <string name="menu">Menu</string>
+    <string name="changeNameLabel">change name</string>
+    <string name="changeWorkoutNameLabel">Change workout name</string>
+    <string name="changeWorkoutNameFilterLabel">Change value filter by name</string>
+    <string name="workoutsFilterByName">Filter by name</string>
+    <string name="Unnamend">Unnamed</string>
+    <string name="startTimeLabel">Start time</string>
+    <string name="endTimeLabel">End time</string>
+    <string name="Points">Points</string>
+    <string name="minHeight">Min height</string>
+    <string name="maxHeight">Max height</string>
+    <string name="action_info">About workout</string>
+    <string name="yesLabel">Yes</string>
+    <string name="noLabel">No</string>
+    <string name="action_ignorepoints_list">Ignore points</string>
+    <string name="action_ignorepoints_add">Add point manually</string>
+    <string name="errorValueInfo">Any of the value is empty</string>
+    <string name="ignorePointNotify">Ignore Points Area</string>
+    <string name="ignorePointsInfo">Here you can modify the list of points that while training to be skipped.
+    </string>
+    <string name="latitudeLabel">Latitude</string>
+    <string name="longitudeLabel">Longitude</string>
+    <string name="ignorePointsExists">Points already exist</string>
+    <string name="action_ignorepoints_add_from_map">Add point from map</string>
+    <string name="nameLabel">Name</string>
+    <string name="vibraNotifylabel">Vibration notifications</string>
+    <string name="workout">Workout</string>
+    <string name="exitAlertLabel">Warning before leaving</string>
+    <string name="workoutInfoDetailsLabel">Details</string>
+    <string name="workoutInfoMapLabel">Map</string>
+    <string name="startPointLabel">Start</string>
+    <string name="endPointLabel">End</string>
+    <string name="deleteWorkoutTitleAlert">Deleting workout</string>
+    <string name="deleteWorkoutTextAlert">Do you want delete workout?</string>
+    <string name="centerToLocationMap">Center to current Location</string>
+    <string name="addIgnorePointDesciption">Here you can add ignored point from map. Click on any
+        point on the map to mark</string>
+    <string name="doneLabel">Done</string>
+    <string name="notificationsGroupLabel">Notifications</string>
+    <string name="otherSettingsLabel">Others</string>
+    <string name="settingShwoWorkoutInfoTitle">Show workout info</string>
+    <string name="gpsWorkoutSettingsLabel">GPS settings</string>
+    <string name="disableMapSettingLabel">Disable map</string>
+    <string name="exportingTitleLabel">Exporting</string>
+    <string name="exportingMessageLabel">Please Wait...</string>
+    <string name="resetFiltersLabel">Reset filters</string>
+    <string name="menuFiltersLabel">Filters</string>
+    <string name="action_workout_mapview">Workout map</string>
+    <string name="gpsOffText">GPS is off</string>
+    <string name="title_activity_maps_route">Map</string>
+    <string name="title_activity_ocorrencias_list">OcorrenciasListActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+</resources>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+  <!--<SwitchPreference-->
+      <!--android:defaultValue="false"-->
+      <!--android:key="prefs_notifications"-->
+      <!--android:title="Enable Notifications"/>-->
+
+  <SwitchPreference
+   android:defaultValue="false"
+   android:key="upload_img_mobile"
+   android:title="Dados Móveis: Imagens"
+   android:summary="Upload automático  de imagens na rede móvel?"/>
+
+
+  <SwitchPreference
+      android:defaultValue="true"
+      android:key="upload_oco_mobile"
+      android:title="Dados Móveis: Ocorrências"
+      android:summary="Upload automático de ocorrências de entrega na rede móvel?"/>
+
+  <SwitchPreference
+      android:defaultValue="false"
+      android:key="download_mobile"
+      android:title="Download na rede móvel?" />
+
+  <SwitchPreference
+      android:defaultValue="true"
+      android:key="scanner_obrigatorio"
+      android:title="Entrega Normal:"
+      android:summary="Canhoto obrigatório no registro da entrega normal?" />
+
+  <SwitchPreference
+      android:defaultValue="true"
+      android:key="filtrar_ocorrencias"
+      android:title="Filtrar Ocorrências:"
+      android:summary="Utilizar apenas ocorrências definidas para o aplicativo?" />
+
+  <EditTextPreference
+      android:key="img_width"
+      android:title="Resolução da Imagem"
+      android:summary="Valor em pixels para imagens processadas no aplicativo."
+      android:numeric="integer"
+      android:defaultValue="1000"
+      android:maxLength="4"
+      />
+
+  <EditTextPreference
+      android:key="img_compress"
+      android:title="Percentual de Compressão da Imagem"
+      android:summary="Valor percentual para compressão das imagens processadas no aplicativo."
+      android:numeric="integer"
+      android:defaultValue="75"
+      android:maxLength="2"
+      />
+
+
+  <EditTextPreference
+    android:key="interval_sync"
+    android:title="Intervalo de Sincronização em Minutos"
+    android:summary="Intervalo para sincronização automática de dados."
+    android:numeric="integer"
+    android:defaultValue="5"
+    android:maxLength="2"
+  />
+
+
+  <EditTextPreference
+      android:key="interval_tracking"
+      android:title="Intervalo coleta GPS em Minutos"
+      android:summary="Intervalo para coleta de dados de localização via GPS."
+      android:numeric="integer"
+      android:defaultValue="2"
+      android:maxLength="2"
+      />
+
+  <Preference
+      android:key="@string/send_feedback"
+      android:summary="Nós gostariamos de saber sua opinião. Diga se gostou ou não?"
+      android:title="Enviar Feedback"/>
+
+  <Preference
+      android:key="version"
+      android:summary="@string/version"
+      android:title="Versão"/>
+
+  <Preference
+      android:key="copyright"
+      android:summary="Softlog Tecnologia © 2018. All rights reserved."
+      android:title="Copyright"/>
+
+</PreferenceScreen>

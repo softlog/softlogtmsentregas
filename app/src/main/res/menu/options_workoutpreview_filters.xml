@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+    <item
+            android:title="@string/menuFiltersLabel"
+            android:id="@+id/action_overflow"
+            android:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_filter_by_date"
+                android:icon="@drawable/emptytick"
+                android:title="@string/workoutsFilterByDate"
+                android:showAsAction="always|withText"/>
+
+            <item
+                    android:id="@+id/action_filter_by_name"
+                    android:icon="@drawable/emptytick"
+                    android:title="@string/workoutsFilterByName"
+                    android:showAsAction="always|withText"/>
+            <item
+                    android:id="@+id/action_filters_reset"
+                    android:icon="@drawable/emptytick"
+                    android:title="@string/resetFiltersLabel"
+                    android:showAsAction="always|withText"/>
+        </menu>
+    </item>
+
+</menu>
