@@ -122,8 +122,6 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
         idDocumento = inCall.getLongExtra("id_documento",0);
 
 
-
-
         Ocorrencia oco = manager.findOcorrenciaById(idOcorrencia);
 
         txtOcorrencia.setText(oco.getOcorrencia().toString());
@@ -205,7 +203,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
                         Intent i = new Intent(getApplicationContext(), MainActivityCrop.class);
 
 
-                        i.putExtra("id_ocorrencia", Long.valueOf(1));
+                        i.putExtra("id_ocorrencia", idOcorrencia);
                         i.putExtra("id_documento", idDocumento);
                         i.putExtra("data_ocorrencia", dataOcorrencia);
                         i.putExtra("hora_ocorrencia", horaOcorrencia);
@@ -217,6 +215,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
 
                         startActivity(i);
                         dialog.dismiss();
+
                         // Do nothing but close the dialog
                     }
                 });
@@ -260,8 +259,10 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
 
                         Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
                         startActivity(mainIntent);
+
                         // Do nothing
                         dialog.dismiss();
+
 
 
                     }

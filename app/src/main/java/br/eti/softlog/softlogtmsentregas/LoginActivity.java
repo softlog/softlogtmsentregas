@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import br.eti.softlog.model.Usuario;
 import br.eti.softlog.utils.AppSingleton;
 import br.eti.softlog.utils.MaskEditUtil;
+import io.sentry.core.Sentry;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,7 +46,9 @@ public class LoginActivity extends AppCompatActivity {
 
         myapp = (EntregasApp)getApplicationContext();
 
-//Validacao do Usuario
+
+
+        //Validacao do Usuario
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,15 +195,22 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
 
+
                                 //Log.d("ERRO",error.toString());
-                                if (error.networkResponse.statusCode==404){
+                                if (error.networkResponse == null){
                                     Toast.makeText(getApplicationContext(),
-                                            R.string.usuario_inexistente,
+                                            "Favor verificar sua conexão.",
                                             Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(getApplicationContext(),
-                                            R.string.erro_acesso,
-                                            Toast.LENGTH_LONG).show();
+                                    if (error.networkResponse.statusCode==404){
+                                        Toast.makeText(getApplicationContext(),
+                                                R.string.usuario_inexistente,
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),
+                                                R.string.erro_acesso,
+                                                Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             }
                         });

@@ -31,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.blankj.utilcode.util.ActivityUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,6 +65,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
+import io.sentry.core.Sentry;
 
 import static br.eti.softlog.utils.Util.getDateFormatYMD;
 
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     private FusedLocationProviderClient mFusedLocationClient;
 
 
+
+
     AdapterListViewEntregas adapter;
     List<Documento> documentos;
     List<Pessoa> entregas;
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     ProgressBar progressBar;
 
     TextView txtDate;
+    TextView txtUsuario;
 
     static final int DATE_DIALOG_ID = 0;
 
@@ -113,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        ActivityUtils.finishAllActivitiesExceptNewest();
 
         //AndPermission.with(this);
 
@@ -206,14 +213,18 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         txtDate = findViewById(R.id.txtDate);
 
+
         Date data_corrente = myapp.getDate();
         txtDate.setText(getDateFormat(data_corrente));
 
+        txtUsuario = findViewById(R.id.txtUsuario);
+        txtUsuario.setText(myapp.getUsuario().getNome().toString());
+        //loadOcorrencias();
         this.dataSync(data_corrente);
 
         Intent intentSource = getIntent();
         String flagServico = intentSource.getStringExtra("flagServico");
-        loadOcorrencias();
+
 
         //Inicializa os Servicos
         Intent it = new Intent(this.getApplicationContext(), ServiceMain.class);
@@ -222,10 +233,15 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         Intent it2 = new Intent(this.getApplicationContext(),LocationService.class);
         startService(it2);
 
+
         //Intent it2 = new Intent(this.getApplicationContext(),ServiceTracking.class);
         //startService(it2);
+        try {
+            getDistanceDuration();
+        } catch (Exception e) {
 
-        getDistanceDuration();
+        }
+
 
         lista_entregas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -315,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
             documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
             reloadAllData();
-            loadOcorrencias();
+            //loadOcorrencias();
             alert("Dados Atualizados.");
 
         } else if (id == R.id.sincronizar) {
@@ -441,7 +457,12 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                     dataSync(data_corrente);
 
-                    getDistanceDuration();
+                    try {
+                        getDistanceDuration();
+                    } catch (Exception e ){
+
+                    }
+
 //                    reloadAllData();
 
 //                    Log.d("Quantidade", String.valueOf(protocolos.size()));
@@ -632,6 +653,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                                                     //Log.d("Resposta", result.toString());
                                                     try {
+                                                        Log.d("Ponto","Parada");
                                                         JSONObject jObj = new JSONObject(result.toString());
 
                                                         JSONArray routes = jObj.getJSONArray("routes");
@@ -649,6 +671,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                                                     } catch (JSONException e1) {
                                                         e1.printStackTrace();
+                                                        doc.setDistance(Double.valueOf("0.00"));
+                                                        doc.setTempoEstimado(Double.valueOf("0.00"));
                                                     }
                                                     // do stuff with the result or error
                                                 }
@@ -659,9 +683,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                         }
                     }
                 });
-
-
-
 
     }
 

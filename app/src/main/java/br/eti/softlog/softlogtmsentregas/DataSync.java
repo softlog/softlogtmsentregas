@@ -2,9 +2,12 @@ package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Base64InputStream;
 import android.util.Log;
@@ -25,6 +28,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
@@ -45,8 +52,10 @@ import android.content.SharedPreferences;
 
 import static android.content.Context.MODE_PRIVATE;
 import static org.greenrobot.greendao.identityscope.IdentityScopeType.None;
+import static org.osmdroid.tileprovider.util.StreamUtils.copy;
 
 import br.eti.softlog.softlogtmsentregas.R;
+import me.echodev.resizer.Resizer;
 
 /**
  * Created by Paulo Sergio on 2018/03/01.
@@ -269,6 +278,7 @@ public class DataSync {
             final JSONArray jaImagens = new JSONArray();
 
             for (int i=0; i < imagens.size(); i++){
+
                 JSONObject joImagem = new JSONObject();
                 ImagemOcorrencia image = imagens.get(i);
                 if (image.getNomeArquivo() == null) {
@@ -280,23 +290,50 @@ public class DataSync {
 
                     String path = myapp.getApplicationContext().getFilesDir().toString();
 
+
                     File root = Environment.getExternalStorageDirectory();
                     //ImageView IV = (ImageView) findViewById(R.id."image view");
                     Bitmap bMap = BitmapFactory.decodeFile(path +"/" + image.getNomeArquivo());
 
+
                     if (bMap == null) {
                         continue;
                     }
+
+                    if (bMap.getWidth() > myapp.getConfigResolucao()){
+                        File file2 = null;
+                        try {
+                            file2 = file_from(Uri.fromFile(new File(path +"/" + image.getNomeArquivo())));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        String nameFile2 = image.getNomeArquivo();
+
+                        resize_image(file2,nameFile2.replace(".jpg",""), path);
+
+                    }
+
+
+                    bMap = BitmapFactory.decodeFile(path +"/" + image.getNomeArquivo());
+
+
+                    if (bMap == null) {
+                        continue;
+                    }
+
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     bMap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+
 
                     byte[] byteArray = byteArrayOutputStream .toByteArray();
 
                     encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                    bMap = null;
+
                 } catch (Error e2) {
                     e2.printStackTrace();
                     continue;
-
                 }
 
                 try {
@@ -309,53 +346,62 @@ public class DataSync {
                 }
 
                 jaImagens.put(joImagem);
-            }
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("imagens",jaImagens);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            JSONObject json = new JSONObject();
-            try {
-                json.put("imagens",jaImagens);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                String strJson;
+                try{
+                    strJson = json.toString();
+                } catch (OutOfMemoryError e){
+                    alert("Imagem está muito grande, reconfigure a resolução de largura da mesma.");
+                    return ;
+                }
+                //Log.d("Json", json.toString());
 
-            String strJson = json.toString();
-
-            //Log.d("Json", json.toString());
-
-            final String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
-            String url = "http://api.softlog.eti.br/api/softlog/imagem";
+                final String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
+                String url = "http://api.softlog.eti.br/api/softlog/imagem";
 
 
-            //Registro do usuario e criacao do banco de dados
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            for(int i=0; i < imagens.size();i++){
-                                ImagemOcorrencia img = imagens.get(i);
-                                img.setSincronizado(true);
-                                myapp.getDaoSession().update(img);
+                //Registro do usuario e criacao do banco de dados
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                image.setSincronizado(true);
+                                myapp.getDaoSession().update(image);
+                                /*
+                                for(int i=0; i < imagens.size();i++){
+                                    ImagemOcorrencia img = imagens.get(i);
+                                    img.setSincronizado(true);
+                                    myapp.getDaoSession().update(img);
+                                }*/
                             }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-                    //Log.d("ERRO",error.toString());
-                }
-            })
-            {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String,String> parameters = new HashMap<String,String>();
-                    parameters.put("imagens",jaImagens.toString());
-                    parameters.put("codigo_acesso",codigo_acesso);
-                    return parameters;
-                }
+                        //Log.d("ERRO",error.toString());
+                    }
+                })
+                {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> parameters = new HashMap<String,String>();
+                        parameters.put("imagens",jaImagens.toString());
+                        parameters.put("codigo_acesso",codigo_acesso);
+                        return parameters;
+                    }
 
-            };
+                };
 
-            AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest,"Ocorrencias");
+                AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest,"Ocorrencias");
+
+            }
+
         }
 
     }
@@ -434,7 +480,104 @@ public class DataSync {
     }
 
     private void alert(String s){
-        Toast.makeText(mContext, s,Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, s,Toast.LENGTH_LONG).show();
     }
+
+    private void resize_image(File file, String nameFile, String path){
+
+       try {
+            int width = myapp.getConfigResolucao();
+
+            File resizedImage = new Resizer(this.mContext)
+                    .setTargetLength(width)
+                    .setOutputFormat("JPEG")
+                    .setOutputFilename(nameFile)
+                    .setOutputDirPath(path)
+                    .setSourceImage(file)
+                    .getResizedFile();
+
+        } catch (IOException e) {
+            //Log.d("erro",e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    private File file_from(Uri uri) throws IOException {
+        InputStream inputStream = this.mContext.getContentResolver().openInputStream(uri);
+        String fileName = getFileName(uri);
+        String[] splitName = splitFileName(fileName);
+        File tempFile = File.createTempFile(splitName[0], splitName[1]);
+
+        tempFile = rename(tempFile, fileName);
+        tempFile.deleteOnExit();
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(tempFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (inputStream != null) {
+            copy(inputStream, out);
+            inputStream.close();
+        }
+
+        if (out != null) {
+            out.close();
+        }
+        return tempFile;
+    }
+
+    private String[] splitFileName(String fileName) {
+        String name = fileName;
+        String extension = "";
+        int i = fileName.lastIndexOf(".");
+        if (i != -1) {
+            name = fileName.substring(0, i);
+            extension = fileName.substring(i);
+        }
+
+        return new String[]{name, extension};
+    }
+
+    private File rename(File file, String newName) {
+        File newFile = new File(file.getParent(), newName);
+        if (!newFile.equals(file)) {
+            if (newFile.exists() && newFile.delete()) {
+                // Log.d("FileUtil", "Delete old " + newName + " file");
+            }
+            if (file.renameTo(newFile)) {
+                // Log.d("FileUtil", "Rename file to " + newName);
+            }
+        }
+        return newFile;
+    }
+
+    private String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = this.mContext.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf(File.separator);
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
 
 }

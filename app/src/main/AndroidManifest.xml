@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.eti.softlog.softlogtmsentregas">
 
+
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -25,6 +27,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:name="io.sentry.dsn" android:value="https://a43a167e431f40c79210131ee5a6be93@sentry.io/4465974" />
 
         <!-- Splash screen -->
         <activity

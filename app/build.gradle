@@ -2,14 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "br.eti.softlog.softlogtmsentregas"
         minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 8
-        versionName "2.0.7"
+        targetSdkVersion 28
+        versionCode 12
+        versionName "2.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -83,7 +84,13 @@ dependencies {
     implementation 'com.github.delight-im:Android-SimpleLocation:v1.0.1'
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'com.github.hkk595:Resizer:v1.5'
+    implementation 'io.sentry:sentry-android:2.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
 
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+
+    implementation 'com.blankj:utilcode:1.26.0'
+    //https://github.com/amitshekhariitbhu/Android-Debug-Database
     //implementation 'org.slf4j:slf4j-nop:1.7.25'
 }
 greendao {

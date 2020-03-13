@@ -119,13 +119,19 @@ public class AdapterListViewEntregas extends BaseAdapter {
 
         txtDuracao.setText(sDuracao);
 
-        if (doc.getOcorrencia().getPendencia()){
-            txtColor.setBackgroundColor(Color.RED);
-        } else if (doc.getOcorrencia().getId() > 0) {
-            txtColor.setBackgroundColor(Color.GREEN);
-        } else {
-            txtColor.setBackgroundColor(Color.YELLOW);
+
+        try {
+            if (doc.getOcorrencia().getPendencia()){
+                txtColor.setBackgroundColor(Color.RED);
+            } else if (doc.getOcorrencia().getId() > 0) {
+                txtColor.setBackgroundColor(Color.GREEN);
+            } else {
+                txtColor.setBackgroundColor(Color.YELLOW);
+            }
+        } catch (Exception e) {
+
         }
+
 
         return view;
     }

@@ -136,6 +136,8 @@ public final class MainFragmentCrop extends Fragment
         longitude = ((MainActivityCrop) activity).getLongitude();
 
 
+
+
         return rootView;
     }
 
@@ -241,8 +243,10 @@ public final class MainFragmentCrop extends Fragment
             intent.putExtra("latitude",latitude);
             intent.putExtra("longitude",longitude);
 
-
+            //startActivityForResult(intent,321);
             startActivity(intent);
+
+
         } else {
             //Log.e("AIC", "Failed to crop image", result.getError());
             Toast.makeText(

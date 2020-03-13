@@ -11,9 +11,11 @@ import android.location.Location;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.Utils;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 
@@ -31,7 +33,7 @@ import br.eti.softlog.model.UsuarioDao;
  * Created by Paulo Sérgio Alves on 2018/03/13.
  */
 
-public class EntregasApp extends Application {
+public class EntregasApp extends MultiDexApplication {
     private static EntregasApp singleton;
 
     private DaoSession mDaoSession;
@@ -65,6 +67,11 @@ public class EntregasApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+
+
+         Utils.init(this);
 
         singleton = this;
         tipoStatus = 1;

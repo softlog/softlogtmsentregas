@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.koushikdutta.ion.builder.Builders;
 
@@ -59,6 +60,8 @@ public final class CropResultActivity extends AppCompatActivity {
     public Double latitude;
     public Double longitude;
 
+    Intent inCall;
+
 
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -94,6 +97,8 @@ public final class CropResultActivity extends AppCompatActivity {
         imageView.setBackgroundResource(R.drawable.backdrop);
 
         intent = getIntent();
+
+
 
         if (mImage != null) {
             imageView.setImageBitmap(mImage);
@@ -306,7 +311,9 @@ public final class CropResultActivity extends AppCompatActivity {
 
             Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(mainIntent);
+
             finish();
+
 
             //OcorrenciaDocumento oco = new OcorrenciaDocumento(idDocumento,)
 

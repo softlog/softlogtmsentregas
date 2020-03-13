@@ -45,6 +45,7 @@ public class ExtractRomaneioJson {
                 manager.addCidade(idCidade,nomeCidade,uf,cod_ibge);
             }
 
+
             //Gravando Pessoas
             JSONArray pessoas = jObj.getJSONArray("pessoas");
 
@@ -84,6 +85,36 @@ public class ExtractRomaneioJson {
                 String descricao = veiculo.getString("descricao");
 
                 manager.addVeiculo(placa,descricao);
+            }
+
+            //Gravando Ocorrencias
+            JSONArray ocorrencias = jObj.getJSONArray("ocorrencias");
+
+            for (int i = 0; i <ocorrencias.length(); i++ ){
+                JSONObject ocorrencia = ocorrencias.getJSONObject(i);
+
+                //Log.d("Ocorrencia",ocorrencia.toString());
+                Long idOcorrencia = ocorrencia.getLong("id_ocorrencia");
+                String ocorrenciaDesc = ocorrencia.getString("ocorrencia");
+                int pendencia = ocorrencia.getInt("pendencia");
+                int ativo = ocorrencia.getInt("aplicativo_mobile");
+
+                boolean bPendencia;
+
+                if (pendencia == 1)
+                    bPendencia = true;
+                else
+                    bPendencia = false;
+
+                boolean bAtivo;
+
+                if (ativo == 1)
+                    bAtivo = true;
+                else
+                    bAtivo = false;
+
+                manager.addOcorrencia(idOcorrencia,ocorrenciaDesc,bPendencia, bAtivo);
+
             }
 
             //Gravando Romaneios
