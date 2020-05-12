@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Credentials;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.OpenableColumns;
@@ -14,6 +16,16 @@ import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -55,6 +67,7 @@ import static org.greenrobot.greendao.identityscope.IdentityScopeType.None;
 import static org.osmdroid.tileprovider.util.StreamUtils.copy;
 
 import br.eti.softlog.softlogtmsentregas.R;
+import io.sentry.core.Sentry;
 import me.echodev.resizer.Resizer;
 
 /**
@@ -67,11 +80,13 @@ public class DataSync {
 
     private Context mContext;
 
+
     EntregasApp myapp;
     private Manager manager;
     private boolean executando;
     Util util;
     Connectivity connectivity;
+    CognitoCachingCredentialsProvider credentialsProvider;
 
     public DataSync(Context context) {
         mContext = context;
@@ -79,6 +94,14 @@ public class DataSync {
         manager = new Manager(myapp);
         util = new Util();
         connectivity = new Connectivity();
+
+
+        credentialsProvider = new CognitoCachingCredentialsProvider(
+                mContext,
+                "us-east-1:1dfdb86d-ce11-4a0c-b93d-2246d23be812", // ID do grupo de identidades
+                Regions.US_EAST_1 // Região
+        );
+
     }
 
     public void getRomaneios(){
@@ -185,8 +208,8 @@ public class DataSync {
 
                     if (ocorrencia.getImagemOcorrencias().size()>0){
                         ImagemOcorrencia imagemOcorrencia = ocorrencia.getImagemOcorrencias().get(0);
-                        String urlImagem = "http://api.softlog.eti.br/api/softlog/imagem/"
-                                + myapp.getUsuario().getCodigoAcesso()
+                        String urlImagem = "https://sconfirmei.s3-sa-east-1.amazonaws.com/imagens/"
+                                + String.valueOf(myapp.getUsuario().getCodigoAcesso())
                                 + "/" + imagemOcorrencia.getNomeArquivo();
 
                         joOcorrencia.put("url_imagem",urlImagem);
@@ -292,119 +315,65 @@ public class DataSync {
 
 
                     File root = Environment.getExternalStorageDirectory();
-                    //ImageView IV = (ImageView) findViewById(R.id."image view");
-                    Bitmap bMap = BitmapFactory.decodeFile(path +"/" + image.getNomeArquivo());
+                    //ImageView IV = (ImageView) findViewById(R.id."image view")// ;
 
-
-                    if (bMap == null) {
-                        continue;
-                    }
-
-                    if (bMap.getWidth() > myapp.getConfigResolucao()){
-                        File file2 = null;
-                        try {
-                            file2 = file_from(Uri.fromFile(new File(path +"/" + image.getNomeArquivo())));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        String nameFile2 = image.getNomeArquivo();
-
-                        resize_image(file2,nameFile2.replace(".jpg",""), path);
-
-                    }
-
-
-                    bMap = BitmapFactory.decodeFile(path +"/" + image.getNomeArquivo());
-
-
-                    if (bMap == null) {
-                        continue;
-                    }
-
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    bMap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-
-
-                    byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                    encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                    bMap = null;
-
-                } catch (Error e2) {
-                    e2.printStackTrace();
-                    continue;
-                }
-
-                try {
-                    joImagem.put("ocorrencia_documento_id",image.getOcorrenciaDocumentoId().longValue());
-                    joImagem.put("nome_arquivo",image.getNomeArquivo());
-                    joImagem.put("arquivo",encoded);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                jaImagens.put(joImagem);
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("imagens",jaImagens);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String strJson;
-                try{
-                    strJson = json.toString();
-                } catch (OutOfMemoryError e){
-                    alert("Imagem está muito grande, reconfigure a resolução de largura da mesma.");
-                    return ;
-                }
-                //Log.d("Json", json.toString());
-
-                final String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
-                String url = "http://api.softlog.eti.br/api/softlog/imagem";
-
-
-                //Registro do usuario e criacao do banco de dados
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
+                    String fileImagem = image.getNomeArquivo();
                                 image.setSincronizado(true);
                                 myapp.getDaoSession().update(image);
-                                /*
-                                for(int i=0; i < imagens.size();i++){
-                                    ImagemOcorrencia img = imagens.get(i);
-                                    img.setSincronizado(true);
-                                    myapp.getDaoSession().update(img);
-                                }*/
+
+                    AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+                    TransferUtility transferUtility = new TransferUtility(s3, mContext);
+                    s3.setRegion(Region.getRegion(Regions.SA_EAST_1));
+
+                    String key = "imagens/" + String.valueOf(myapp.getUsuario().getCodigoAcesso()) + "/" + fileImagem;
+                    Log.d("Upload:", key);
+
+                    final TransferObserver observer = transferUtility.upload(
+                            "sconfirmei",
+                            key,
+                            new File(path + '/' + fileImagem),
+                            CannedAccessControlList.PublicRead
+                    );
+
+                    observer.setTransferListener(new TransferListener() {
+                        @Override
+                        public void onStateChanged(int id, TransferState state) {
+                            if (state.equals(TransferState.COMPLETED)) {
+                                    image.setSincronizado(true);
+                                    myapp.getDaoSession().update(image);
+
+                            } else if (state.equals(TransferState.FAILED)) {
+
                             }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                        }
 
-                        //Log.d("ERRO",error.toString());
-                    }
-                })
-                {
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String,String> parameters = new HashMap<String,String>();
-                        parameters.put("imagens",jaImagens.toString());
-                        parameters.put("codigo_acesso",codigo_acesso);
-                        return parameters;
-                    }
+                        @Override
+                        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
 
-                };
+                        }
 
-                AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest,"Ocorrencias");
+                        @Override
+                        public void onError(int id, Exception ex) {
+                                //Log.d("Ocorreu um erro", ex.getMessage());
+                                Sentry.captureException(ex);
+                        }
+                    });
 
-            }
 
+
+                } catch (Exception e){
+                    Sentry.captureException(e);
+                }
         }
+    }
+
+
+
+
+
 
     }
+
 
     public void sendTracking() {
 

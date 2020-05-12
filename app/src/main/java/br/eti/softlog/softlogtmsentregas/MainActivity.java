@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,16 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,12 +58,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 
 import br.eti.softlog.model.Documento;
 import br.eti.softlog.model.DocumentoDao;
@@ -76,9 +89,13 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     Manager manager;
     DataSync dataSync2;
     Connectivity connectivity;
+    Context context;
+    Date dateSync;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
+    // Inicializar o provedor de credenciais do Amazon Cognito
+    CognitoCachingCredentialsProvider credentialsProvider;
 
 
 
@@ -118,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        context = this.getApplicationContext();
 
         ActivityUtils.finishAllActivitiesExceptNewest();
 
@@ -382,45 +401,10 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             }
         }
 
-        alert("Sincronizando com o servidor!");
-        String cData = Util.getDateFormatYMD(data);
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
-        String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
-        String cpf = myapp.getUsuario().getCpf();
+        dateSync = data;
 
-        String url = "http://api.softlog.eti.br/api/softlog/romaneio2/" + codigo_acesso +
-                "/" + cData + "/" + cpf;
-
-        //url = "http://api.softlog.eti.br/api/softlog/protocolo/53/2018-02-01/0";
-        //url = "http://api.softlog.eti.br/api/softlog/romaneio/81/2017-12-22/16286172840";
-
-        //Log.d("Url",url);
-        progressBar.setVisibility(View.VISIBLE);
-        //Registro do usuario e criacao do banco de dados
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        extractRomaneioJson.extract(response);
-                        reloadAllData();
-                        progressBar.setVisibility(View.INVISIBLE);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                //Log.d("ERRO",error.toString());
-                if (error.networkResponse != null) {
-                    reloadAllData();
-                    progressBar.setVisibility(View.INVISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest, "Romaneios");
+        new AsyncCircular().execute();
         //Log.d("Log","Processo Concluido!");
     }
 
@@ -563,7 +547,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             }
         }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -571,10 +556,10 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return;
+            return ;
         }
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener((Executor) this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
@@ -684,6 +669,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     }
                 });
 
+
     }
 
 
@@ -691,4 +677,86 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     public void onLocationUpdated(Location location) {
 
     }
+
+
+    public class AsyncCircular extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //Backup e criação de novo banco de dados
+
+
+            String cData = Util.getDateFormatYMD(dateSync);
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+            String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
+            String cpf = myapp.getUsuario().getCpf();
+
+            String url = "http://api.softlog.eti.br/api/softlog/romaneio2/" + codigo_acesso +
+                    "/" + cData + "/" + cpf;
+
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            extractRomaneioJson.extract(response);
+                            reloadAllData();
+                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    //Log.d("ERRO",error.toString());
+                    if (error.networkResponse != null) {
+                        reloadAllData();
+                        progressBar.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+            AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest, "Romaneios");
+
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+/*
+            switch (values[0]) {
+                case 0: {
+                    txtStatus.setText("Importando criadores");
+                    break;
+                }
+                case 1: {
+                    txtStatus.setText("Importando Pedigree");
+                    break;
+                }
+                case 2: {
+                    txtStatus.setText("Importando Dados dos Animais");
+                    break;
+                }
+            }
+*/
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            reloadAllData();
+            progressBar.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+
 }
