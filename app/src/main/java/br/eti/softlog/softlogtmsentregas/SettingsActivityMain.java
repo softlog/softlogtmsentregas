@@ -8,10 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
-import br.eti.softlog.softlogtmsentregas.R;
 
 public class SettingsActivityMain extends AppCompatActivity {
 

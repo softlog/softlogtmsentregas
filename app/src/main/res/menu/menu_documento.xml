@@ -15,10 +15,17 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/menu_canhotos"
+        android:icon="@drawable/ic_imagens"
+        android:title="Canhotos"
+        app:showAsAction="always" />
+
+
+    <item
         android:id="@+id/menu_ocorrencias"
         android:icon="@drawable/ic_action_ocorrencias"
         android:title="Ocorrência"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_mapa"

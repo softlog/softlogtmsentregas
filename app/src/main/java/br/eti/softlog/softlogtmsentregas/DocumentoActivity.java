@@ -1,21 +1,15 @@
 package br.eti.softlog.softlogtmsentregas;
 
-import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
-import android.text.style.MaskFilterSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.LatLng;
 
 import br.eti.softlog.utils.Util;
 
@@ -23,7 +17,6 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import br.eti.softlog.model.Documento;
-import br.eti.softlog.utils.Util;
 
 
 public class DocumentoActivity extends AppCompatActivity {
@@ -67,6 +60,9 @@ public class DocumentoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_documento);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle("Documento");
 
         app = (EntregasApp)getApplicationContext();
         manager = new Manager(app);
@@ -208,9 +204,15 @@ public class DocumentoActivity extends AppCompatActivity {
             startActivity(i);
 
         } else if (id == R.id.menu_ocorrencias) {
-            Intent i = new Intent(getApplicationContext(),OcorrenciasListActivity.class);
+            //Intent i = new Intent(getApplicationContext(),OcorrenciasListActivity.class);
+            //i.putExtra("id_documento",idDocumento);
+            //startActivity(i);
+            //finish();
+        } else if (id == R.id.menu_canhotos) {
+            Intent i = new Intent(getApplicationContext(),ImagensOcorrencias.class);
             i.putExtra("id_documento",idDocumento);
             startActivity(i);
+            finish();
         }
 
 
@@ -259,4 +261,19 @@ public class DocumentoActivity extends AppCompatActivity {
         Toast.makeText(this, s,Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent i = new Intent(getApplicationContext(),MainActivity.class);
+
+        i.putExtra("id_documento",idDocumento);
+
+        startActivity(i);
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        onSupportNavigateUp();
+    }
 }

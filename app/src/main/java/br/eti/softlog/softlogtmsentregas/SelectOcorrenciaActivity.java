@@ -1,23 +1,20 @@
 package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.List;
 
-import br.eti.softlog.model.Documento;
 import br.eti.softlog.model.Ocorrencia;
 import br.eti.softlog.model.OcorrenciaDao;
 
@@ -164,6 +161,22 @@ public class SelectOcorrenciaActivity extends AppCompatActivity {
 //        }
         return super.onOptionsItemSelected(item);
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent i = new Intent(getApplicationContext(),DocumentoActivity.class);
+
+        i.putExtra("id_documento",idDocumento);
+
+        startActivity(i);
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        onSupportNavigateUp();
     }
 
 }

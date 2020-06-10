@@ -7,10 +7,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,8 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import br.eti.softlog.softlogtmsentregas.R;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -45,6 +44,7 @@ public class MainActivityCrop extends AppCompatActivity {
     private String observacao;
     private Double latitude;
     private Double longitude;
+    private Long idImagem;
 
     private CropImageViewOptions mCropImageViewOptions = new CropImageViewOptions();
     // endregion
@@ -67,6 +67,8 @@ public class MainActivityCrop extends AppCompatActivity {
 
         Intent inCall = getIntent();
 
+
+
         idOcorrencia = inCall.getLongExtra("id_ocorrencia",Long.valueOf(0));
         idDocumento = inCall.getLongExtra("id_documento",0);
         dataOcorrencia = inCall.getStringExtra("data_ocorrencia");
@@ -76,6 +78,7 @@ public class MainActivityCrop extends AppCompatActivity {
         observacao = inCall.getStringExtra("observacao");
         latitude = inCall.getDoubleExtra("latitude",Double.valueOf(0.00));
         longitude = inCall.getDoubleExtra("longitude",Double.valueOf(0.00));
+        idImagem = inCall.getLongExtra("id_imagem",-1);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -399,5 +402,26 @@ public class MainActivityCrop extends AppCompatActivity {
         else
             return longitude;
 
+    }
+
+    public Long getIdImagem() {
+        return idImagem;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent i = new Intent(getApplicationContext(), RegistroOcorrenciasActivity.class);
+
+        i.putExtra("id_documento",idDocumento);
+        i.putExtra("id_ocorrencia",idOcorrencia);
+
+        startActivity(i);
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        onSupportNavigateUp();
     }
 }

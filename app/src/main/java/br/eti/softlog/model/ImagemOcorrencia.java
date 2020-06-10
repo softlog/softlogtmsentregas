@@ -30,6 +30,7 @@ public class ImagemOcorrencia {
     @Property(nameInDb = "sincronizado")
     private boolean sincronizado;
 
+
 /** Used to resolve relations */
 @Generated(hash = 2040040024)
 private transient DaoSession daoSession;

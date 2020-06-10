@@ -1,9 +1,6 @@
 package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Context;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.util.Log;
 
 import org.greenrobot.greendao.query.Join;
@@ -153,6 +150,26 @@ public class Manager {
         return pessoas;
     }
 
+    public List<ImagemOcorrencia> findImagensOcorrenciasByNFe(Long idDocumento){
+
+
+
+        QueryBuilder qry1 = app.getDaoSession().getImagemOcorrenciaDao().queryBuilder();
+
+        Join joinOcorrencias = qry1.join(ImagemOcorrenciaDao.Properties.OcorrenciaDocumentoId,OcorrenciaDocumento.class);
+
+        Join joinDocumento = qry1.join(joinOcorrencias,OcorrenciaDocumentoDao.Properties.DocumentoId,
+                Documento.class,DocumentoDao.Properties.Id);
+
+        //qryPessoas.LOG_SQL = false;
+        //qryPessoas.LOG_VALUES = false;
+
+        joinDocumento.where(DocumentoDao.Properties.Id.eq(idDocumento));
+
+         return qry1.orderAsc(ImagemOcorrenciaDao.Properties.Id).list();
+
+
+    }
 
     public Pessoa addPessoa(Long id, int tipoPessoa, String nome, String cnpjCpf,
                             String endereco, String numero, String bairro, Long idCidade,
@@ -168,6 +185,25 @@ public class Manager {
             pessoa.setTelefone(telefone);
 
             app.getDaoSession().insert(pessoa);
+
+
+        } else {
+
+            if (!pessoa.getEndereco().equals(endereco)){
+                Log.d("Add Pessoa","Atualizando endereco");
+                pessoa.setEndereco(endereco);
+                pessoa.setBairro(bairro);
+                pessoa.setNumero(numero);
+                pessoa.setIdCidade(idCidade);
+                pessoa.setIdRegiao(idRegiao);
+                pessoa.setCep(cep);
+                pessoa.setLatitude(latitude);
+                pessoa.setLongitude(longitude);
+                pessoa.setTelefone(telefone);
+                pessoa.setWhatsapp(whatsapp);
+                app.getDaoSession().update(pessoa);
+            }
+
         }
 
         return pessoa;
@@ -287,6 +323,29 @@ public class Manager {
                          valor,peso,volumes,idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
                     idConhecimento, distance, tempoEstimado);
             app.getDaoSession().insert(documento);
+        } else {
+
+
+            if (app.getModoConsulta()){
+                documento.setIdOcorrencia(idOcorrencia);
+                documento.setDataOcorrencia(dataOcorrencia);
+                app.getDaoSession().update(documento);
+            }
+
+            //Se documento foi incluido num romaneio mais recente, apaga documento atual
+            // e inclui um novo
+            /*
+            if (romaneioId>documento.getRomaneioId()){
+                app.getDaoSession().delete(documento);
+                documento = new Documento(null,idNotaFiscalImp,dataEmissao,dataExpedicao,chaveNfe,
+                        serie,numeroNotaFiscal,remetenteCnpj,destinatarioCnpj,romaneioId,
+                        valor,peso,volumes,idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
+                        idConhecimento, distance, tempoEstimado);
+
+                app.getDaoSession().insert(documento);
+            }
+             */
+
         }
 
         return documento;

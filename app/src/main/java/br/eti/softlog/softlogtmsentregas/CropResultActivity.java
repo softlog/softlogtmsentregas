@@ -7,10 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.koushikdutta.ion.builder.Builders;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,17 +27,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.net.URI;
 import java.util.Date;
 
 import br.eti.softlog.model.Documento;
 import br.eti.softlog.model.ImagemOcorrencia;
+import br.eti.softlog.model.ImagemOcorrenciaDao;
 import br.eti.softlog.model.OcorrenciaDocumento;
 import br.eti.softlog.utils.Util;
-import id.zelory.compressor.Compressor;
 import me.echodev.resizer.Resizer;
 
 import static org.osmdroid.tileprovider.util.StreamUtils.copy;
+
 
 public final class CropResultActivity extends AppCompatActivity {
 
@@ -59,12 +56,10 @@ public final class CropResultActivity extends AppCompatActivity {
     private String observacao;
     public Double latitude;
     public Double longitude;
+    public Long idImagem;
 
     Intent inCall;
 
-
-
-    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +84,7 @@ public final class CropResultActivity extends AppCompatActivity {
         observacao = inCall.getStringExtra("observacao");
         latitude = inCall.getDoubleExtra("latitude",Double.valueOf(0.00));
         longitude = inCall.getDoubleExtra("longitude", Double.valueOf(0.00));
-
+        idImagem = inCall.getLongExtra("id_imagem",-1);
 
 
 
@@ -143,9 +138,17 @@ public final class CropResultActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        boolean substituir;
+
+        if (idImagem == Long.valueOf(-1))
+            substituir = false;
+        else
+            substituir = true;
+
+
         int id = item.getItemId();
 
-        if (id == R.id.menu_finalizar) {
+        if (id == R.id.menu_finalizar && !(substituir)) {
 
 
             EntregasApp app = (EntregasApp)getApplicationContext();
@@ -318,6 +321,142 @@ public final class CropResultActivity extends AppCompatActivity {
             //OcorrenciaDocumento oco = new OcorrenciaDocumento(idDocumento,)
 
 
+        }
+
+        if (id == R.id.menu_finalizar && substituir) {
+
+            EntregasApp app = (EntregasApp)getApplicationContext();
+            Manager manager = new Manager(app);
+
+
+            //Gravar o arquivo de imagem e registrar na tabela de imagens
+            if (mImage != null) {
+
+
+                ImagemOcorrencia imagemOcorrencia = app.getDaoSession().getImagemOcorrenciaDao().queryBuilder()
+                        .where(ImagemOcorrenciaDao.Properties.Id.eq(idImagem)).unique();
+
+
+
+
+                String path = getApplicationContext().getFilesDir().toString();
+                OutputStream fOut = null;
+                Integer counter = 0;
+
+
+                //Gerar nome do arquivo
+                Util util = new Util();
+                Date date = new Date();
+                String cData = util.getDateTimeFormatYMD(date);
+
+                String nameFile = imagemOcorrencia.getNomeArquivo();
+
+
+                // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+                File file = new File(path, nameFile);
+
+                if (file.exists())
+                    file.delete();
+
+                try {
+                    fOut = new FileOutputStream(file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+
+
+                //Bitmap resized = Bitmap.createScaledBitmap(mImage,(int)(mImage.getWidth()*0.8), (int)(mImage.getHeight()*0.8), true);
+                Bitmap pictureBitmap = mImage;
+                pictureBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+                //Saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+
+                pictureBitmap.recycle();
+
+                //resized.recycle();
+                //resized= null;
+
+
+                imagemOcorrencia.setNomeArquivo(nameFile);
+                imagemOcorrencia.setSincronizado(false);
+                app.getDaoSession().update(imagemOcorrencia);
+
+
+                mImage.recycle();
+                mImage = null;
+
+                try {
+
+                    fOut.flush(); // Not really required
+                    fOut.close(); // do not forget to close the stream
+                    // pictureBitmap.recycle();
+                    //pictureBitmap = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+                File file2 = null;
+                try {
+                    file2 = file_from(Uri.fromFile(new File(file.getAbsolutePath())));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                String nameFile2 = app.getUsuario().getCpf().toString() + "_" +
+                        app.getUsuario().getCodigoAcesso() + "_" +
+                        imagemOcorrencia.getOcorrenciaDocumento().getDocumento().getChaveNfe().toString() + "_"
+                        + String.valueOf(imagemOcorrencia.getId());
+
+                File file3;
+//                try {
+//                    fOut = new FileOutputStream(file);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+
+                try {
+                    int width = app.getConfigResolucao();
+                    int compress = app.getConfigCompressao();
+
+                    File resizedImage = new Resizer(this)
+                            .setTargetLength(width)
+                            .setQuality(compress)
+                            .setOutputFormat("JPEG")
+                            .setOutputFilename(nameFile2)
+                            .setOutputDirPath(path)
+                            .setSourceImage(file2)
+                            .getResizedFile();
+
+                } catch (IOException e) {
+                    //Log.d("erro",e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                Uri imageUri = intent.getParcelableExtra("URI");
+                if (imageUri != null) {
+                    imageView.setImageURI(imageUri);
+                } else {
+                    Toast.makeText(this, "Não há imagem para visualizar", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            releaseBitmap();
+
+
+
+            if (substituir){
+                Toast.makeText(this,"Imagem Substituida com sucesso!",Toast.LENGTH_LONG).show();
+                Intent mainIntent = new Intent(getApplicationContext(),ImagensOcorrencias.class);
+                mainIntent.putExtra("id_documento",idDocumento);
+                startActivity(mainIntent);
+            } else {
+                Toast.makeText(this,"Ocorrência de Entrega gravada com sucesso!",Toast.LENGTH_LONG).show();
+                Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+                ActivityUtils.finishAllActivities();
+                startActivity(mainIntent);
+            }
         }
         return super.onOptionsItemSelected(item);
 

@@ -38,6 +38,7 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         migrations.add(new MigrationV8());
         migrations.add(new MigrationV10());
         migrations.add(new MigrationV11());
+        migrations.add(new MigrationV13());
 
 
         // Sorting just to be safe, in case other people add migrations in the wrong order.
@@ -138,9 +139,29 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
 //
 //
             db.execSQL("ALTER TABLE " + OcorrenciaDao.TABLENAME + " ADD COLUMN " + OcorrenciaDao.Properties.Ativo.columnName + " INTEGER");
+
             //UsuarioDao.createTable(db, false);
         }
     }
+
+    private static class MigrationV13 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 13;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            db.execSQL("ALTER TABLE " + UsuarioDao.TABLENAME + " ADD COLUMN " +  UsuarioDao.Properties.LastLogin.columnName + " TEXT");
+            db.execSQL("ALTER TABLE " + UsuarioDao.TABLENAME + " ADD COLUMN " +  UsuarioDao.Properties.Status.columnName + " INTEGER");
+            db.execSQL("ALTER TABLE " + UsuarioDao.TABLENAME + " ADD COLUMN " +  UsuarioDao.Properties.Sincronizar.columnName + " INTEGER");
+            db.execSQL("ALTER TABLE " + UsuarioDao.TABLENAME + " ADD COLUMN " +  UsuarioDao.Properties.Uuid.columnName + " INTEGER");
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
 
     private interface Migration {
         Integer getVersion();

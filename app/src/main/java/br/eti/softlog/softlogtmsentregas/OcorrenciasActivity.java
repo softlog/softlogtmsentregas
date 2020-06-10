@@ -1,6 +1,6 @@
 package br.eti.softlog.softlogtmsentregas;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 public class OcorrenciasActivity extends AppCompatActivity {

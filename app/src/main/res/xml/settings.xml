@@ -37,6 +37,24 @@
       android:title="Filtrar Ocorrências:"
       android:summary="Utilizar apenas ocorrências definidas para o aplicativo?" />
 
+  <SwitchPreference
+      android:defaultValue="false"
+      android:key="modo_consulta"
+      android:title="Modo consulta:"
+      android:summary="Atualização do status de entregas a cada sincronização." />
+
+  <SwitchPreference
+      android:defaultValue="false"
+      android:key="modo_daltonico"
+      android:title="Modo Daltônico:"
+      android:summary="Utiliza Azul para Status de Entrega Realizada." />
+
+  <SwitchPreference
+      android:defaultValue="false"
+      android:key="modo_debug"
+      android:title="Ativar Log:"
+      android:summary="Coletar informação de eventos no aplicativo." />
+
   <EditTextPreference
       android:key="img_width"
       android:title="Resolução da Imagem"

@@ -34,6 +34,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -108,9 +109,6 @@ public class DataSync {
         //Se nao tiver, acessa api para verificar se existe usuario registrado
         // Request a string response from the provided URL.
 
-
-
-
         RequestQueue queue = Volley.newRequestQueue(mContext);
 
         Date d = myapp.getDate();
@@ -161,7 +159,12 @@ public class DataSync {
 
     public void sendOcorrencias() {
 
+
+        //Log.d(TAG,"Log file path is: " + LogManager.getInstance().getFilePath());
+
         if (!connectivity.isConnected(mContext)) {
+            util.appendLog("Sem conexao com a internet.",myapp.getFileLog());
+            //LogUtil.i(TAG, "Log file path is: " + LogManager.getInstance().getFilePath());
             return;
         }
 
@@ -170,6 +173,8 @@ public class DataSync {
             boolean usar_rede_movel = myapp.getConfigUploadOcorrenciaMobile();
 
             if (!usar_rede_movel){
+                util.appendLog("Sem conexao mobile.",myapp.getFileLog());
+                //LogUtil.i(TAG, "Log file path is: " + LogManager.getInstance().getFilePath());
                 return;
             }
         }
@@ -217,6 +222,7 @@ public class DataSync {
 
 
                 } catch (JSONException e) {
+                    util.appendLog("Envio Ocorrências", e.getMessage(),myapp.getFileLog());
                     e.printStackTrace();
                 }
 
@@ -229,7 +235,7 @@ public class DataSync {
             try {
                 json.put("ocorrencias",jaOcorrencias);
             } catch (JSONException e) {
-                e.printStackTrace();
+                util.appendLog("Envio Ocorrências", e.getMessage(),myapp.getFileLog());
             }
 
             String strJson = json.toString();
@@ -245,18 +251,23 @@ public class DataSync {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+
                             for(int i=0; i < ocorrencias.size();i++){
+                                //LogUtil.i(TAG, "Log file path is: " + LogManager.getInstance().getFilePath());
+
                                 OcorrenciaDocumento oco = ocorrencias.get(i);
                                 oco.setSincronizado(true);
                                 Date date = new Date();
                                 oco.setDataSincronizacao(util.getDateTimeFormatYMD(date));
+                                util.appendLog("Envio de ocorrências",
+                                        "Ocorrência Doc.N.: " + oco.getDocumento().getChaveNfe() + " enviada",myapp.getFileLog());
                                 myapp.getDaoSession().update(oco);
                             }
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-
+                    util.appendLog("Envio Ocorrências", error.getMessage());
                     //Log.d("ERRO",error.toString());
                 }
             })
@@ -281,6 +292,7 @@ public class DataSync {
     public void sendImagens() {
 
         if (!connectivity.isConnected(mContext)) {
+            util.appendLog("Upload Imagem", "Sem conexão.",myapp.getFileLog());
             return;
         }
 
@@ -289,6 +301,7 @@ public class DataSync {
         if (connectivity.isConnectedMobile(mContext)){
             boolean usar_rede_movel = myapp.getConfigUploadImageMobile();
             if (!usar_rede_movel){
+                util.appendLog("Upload Imagem", "Sem conexão móvel.",myapp.getFileLog());
                 return;
             }
 
@@ -313,17 +326,17 @@ public class DataSync {
 
                     String path = myapp.getApplicationContext().getFilesDir().toString();
 
-
-                    File root = Environment.getExternalStorageDirectory();
+                    //File root = Environment.getExternalStorageDirectory();
                     //ImageView IV = (ImageView) findViewById(R.id."image view")// ;
 
                     String fileImagem = image.getNomeArquivo();
-                                image.setSincronizado(true);
-                                myapp.getDaoSession().update(image);
 
                     AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+
                     TransferUtility transferUtility = new TransferUtility(s3, mContext);
                     s3.setRegion(Region.getRegion(Regions.SA_EAST_1));
+
+                    //s3.setRegion(Region.getRegion(Regions.SA_EAST_1));
 
                     String key = "imagens/" + String.valueOf(myapp.getUsuario().getCodigoAcesso()) + "/" + fileImagem;
                     Log.d("Upload:", key);
@@ -341,9 +354,11 @@ public class DataSync {
                             if (state.equals(TransferState.COMPLETED)) {
                                     image.setSincronizado(true);
                                     myapp.getDaoSession().update(image);
+                                    //Log.d("Imagem","Enviada com sucesso");
 
                             } else if (state.equals(TransferState.FAILED)) {
-
+                                util.appendLog("Upload Imagem", "Falha no envio da imagem",myapp.getFileLog());
+                                //Log.d("Imagem","Falha no envio");
                             }
                         }
 
@@ -355,24 +370,26 @@ public class DataSync {
                         @Override
                         public void onError(int id, Exception ex) {
                                 //Log.d("Ocorreu um erro", ex.getMessage());
+                                Sentry.setExtra("Usuario",myapp.getUsuario().getCpf());
+                                Sentry.setExtra("Banco Dados", String.valueOf(myapp.getUsuario().getCodigoAcesso()));
+                                Sentry.setExtra("Imagem", String.valueOf(fileImagem));
+                            util.appendLog("Upload Imagem", ex.getMessage(),myapp.getFileLog());
                                 Sentry.captureException(ex);
+
                         }
                     });
 
-
-
                 } catch (Exception e){
+                    Sentry.setExtra("Usuario",myapp.getUsuario().getCpf());
+                    Sentry.setExtra("Banco Dados", String.valueOf(myapp.getUsuario().getCodigoAcesso()));
+                    Sentry.setExtra("Imagem", String.valueOf(image.getNomeArquivo()));
                     Sentry.captureException(e);
+                    util.appendLog("Upload Imagem", e.getMessage(),myapp.getFileLog());
+                    continue;
                 }
         }
     }
-
-
-
-
-
-
-    }
+}
 
 
     public void sendTracking() {

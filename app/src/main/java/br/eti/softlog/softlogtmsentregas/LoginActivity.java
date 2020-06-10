@@ -1,9 +1,8 @@
 package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +21,6 @@ import org.json.JSONObject;
 import br.eti.softlog.model.Usuario;
 import br.eti.softlog.utils.AppSingleton;
 import br.eti.softlog.utils.MaskEditUtil;
-import io.sentry.core.Sentry;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -83,6 +81,8 @@ public class LoginActivity extends AppCompatActivity {
                     boolean acessa_api = true;
                     if (myapp.doesDatabaseExist(getApplicationContext(), nome_bd)) {
                         myapp.setBD(nome_bd);
+
+                        
                         final Manager manager = new Manager(myapp);
                         if (manager.hasUsuario()){
 
@@ -160,7 +160,9 @@ public class LoginActivity extends AppCompatActivity {
                                             //Insere na tabela de usuarios do aplicativo.
                                             Usuario usuario = new Usuario(id_usuario,nome,cpf,
                                                     login, senha,email,null,null,
-                                                    ln_codigo_acesso);
+                                                    ln_codigo_acesso, null, true,
+                                                    true,
+                                                    myapp.getUUID());
 
 
                                             try {

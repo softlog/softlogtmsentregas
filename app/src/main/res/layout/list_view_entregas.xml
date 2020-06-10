@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,7 +18,8 @@
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/txtColor"
-        app:layout_constraintTop_toBottomOf="@+id/entregaDestinatario" />
+        app:layout_constraintTop_toBottomOf="@+id/entregaDestinatario"
+        android:layout_gravity="start" />
 
     <TextView
         android:id="@+id/entregaNumero"
@@ -34,7 +35,8 @@
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/txtColor"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/entregaDestinatario"
@@ -84,7 +86,8 @@
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/entregaCep"
-        app:layout_constraintTop_toBottomOf="@+id/entregaBairro" />
+        app:layout_constraintTop_toBottomOf="@+id/entregaBairro"
+        android:gravity="end" />
 
     <TextView
         android:id="@+id/entregaTelefone"
@@ -200,4 +203,4 @@
         app:layout_constraintStart_toEndOf="@+id/textView22"
         app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

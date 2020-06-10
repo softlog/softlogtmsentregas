@@ -7,11 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -27,15 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,7 +39,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.JsonObject;
-import com.idescout.sql.SqlScoutServer;
+
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.yanzhenjie.permission.Action;
@@ -58,9 +50,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -68,19 +60,20 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 
 import br.eti.softlog.model.Documento;
+
 import br.eti.softlog.model.DocumentoDao;
+import br.eti.softlog.model.ImagemOcorrencia;
+import br.eti.softlog.model.OcorrenciaDocumento;
 import br.eti.softlog.model.Pessoa;
-import br.eti.softlog.model.Regiao;
+
 import br.eti.softlog.utils.AppSingleton;
 import br.eti.softlog.utils.Connectivity;
 import br.eti.softlog.utils.Util;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.cketti.fileprovider.PublicFileProvider;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
-import io.nlopez.smartlocation.SmartLocation;
-import io.sentry.core.Sentry;
 
-import static br.eti.softlog.utils.Util.getDateFormatYMD;
 
 public class MainActivity extends AppCompatActivity implements OnLocationUpdatedListener {
 
@@ -91,13 +84,12 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     Connectivity connectivity;
     Context context;
     Date dateSync;
+    Util util;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
     // Inicializar o provedor de credenciais do Amazon Cognito
     CognitoCachingCredentialsProvider credentialsProvider;
-
-
 
     AdapterListViewEntregas adapter;
     List<Documento> documentos;
@@ -135,8 +127,16 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         context = this.getApplicationContext();
+
+        myapp = (EntregasApp) getApplicationContext();
+        manager = new Manager(myapp);
+        util = new Util();
+
+        extractRomaneioJson = new ExtractRomaneioJson(getApplicationContext());
+        extractOcorrenciaJson = new ExtractOcorrenciaJson(getApplicationContext());
+        dataSync2 = new DataSync(getApplicationContext());
+        connectivity = new Connectivity();
 
         ActivityUtils.finishAllActivitiesExceptNewest();
 
@@ -211,12 +211,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        myapp = (EntregasApp) getApplicationContext();
-        manager = new Manager(myapp);
-        extractRomaneioJson = new ExtractRomaneioJson(getApplicationContext());
-        extractOcorrenciaJson = new ExtractOcorrenciaJson(getApplicationContext());
-        dataSync2 = new DataSync(getApplicationContext());
-        connectivity = new Connectivity();
+
 
         progressBar = findViewById(R.id.pbMain);
         progressBar = findViewById(R.id.pbMain);
@@ -227,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
 
         lista_entregas = findViewById(R.id.lista_entrega);
-        adapter = new AdapterListViewEntregas(documentos, this);
+        adapter = new AdapterListViewEntregas(documentos, this, myapp);
         lista_entregas.setAdapter(adapter);
 
         txtDate = findViewById(R.id.txtDate);
@@ -249,12 +244,10 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         Intent it = new Intent(this.getApplicationContext(), ServiceMain.class);
         startService(it);
 
-        Intent it2 = new Intent(this.getApplicationContext(),LocationService.class);
-        startService(it2);
-
-
-        //Intent it2 = new Intent(this.getApplicationContext(),ServiceTracking.class);
+        //Intent it2 = new Intent(this.getApplicationContext(),LocationService.class);
         //startService(it2);
+
+
         try {
             getDistanceDuration();
         } catch (Exception e) {
@@ -277,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                 //  chama a Activity que mostra os detalhes
                 startActivity(intent);
+                finish();
             }
 
         });
@@ -294,34 +288,43 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                 .getActionView();
         mSearchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         //
-        mSearchView.setQueryHint("Digite o número do Protocolo");
+        mSearchView.setQueryHint("Digite o número da Nota Fiscal");
 
         //lista_entregas = findViewById(R.id)
         // exemplos de utilização:
-//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                try {
-//                    Long protocolo_id = Long.valueOf(query);
-//                    protocolos = manager.findProtocoloSetorByIdProtocolo(protocolo_id);
-//                    if (protocolos.size()==0){
-//                        alert("Protocolo não encontrado");
-//                    }
-//                    reloadAllData();
-//                } catch (Exception e) {
-////                    Log.d("Erro ao converter",e.toString());
-//                    alert("Favor digitar apenas números.");
-//                }
-//
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-////                Log.i("well", " this worked");
-//                return false;
-//            }
-//        });
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                try {
+
+                    documentos = myapp.getDaoSession().getDocumentoDao().queryBuilder()
+                    .where(DocumentoDao.Properties.NumeroNotaFiscal.like("%" + query.trim() + "%"))
+                    .list();
+
+                    if (documentos.size()==0){
+                        alert("Documento não encontrado");
+                    }
+                    adapter.getData().clear();
+                    adapter.getData().addAll(documentos);
+                    // fire the event
+                    adapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Log.d("Erro ao converter",e.toString());
+                }
+
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                //Log.i("well", " this worked");
+                return false;
+            }
+        });
 
         return true;
     }
@@ -334,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         if (id == android.R.id.home) {
             finish();
         } else if (id == R.id.scanner) {
-            Intent iScanner = new Intent(getApplicationContext(), BarCode2Activity.class);
+            Intent iScanner = new Intent(getApplicationContext(),  BarCode2Activity.class);
             startActivity(iScanner);
 
         } else if (id == R.id.localizar) {
@@ -343,7 +346,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                 dataSync.sendProtocolos();
             } catch (JSONException e) {
                 e.printStackTrace();
-            }*/
+          }*/
+
 
 
         } else if (id == R.id.atualizar) {
@@ -359,6 +363,39 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             dataSync2.sendOcorrencias();
             dataSync2.sendImagens();
 
+        } else if (id == R.id.reenvio_imagens) {
+
+            for (Documento documento:documentos){
+                for (OcorrenciaDocumento oco:documento.getOcorrenciaDocumentos()){
+                    for (ImagemOcorrencia img:oco.getImagemOcorrencias()){
+                        img.setSincronizado(false);
+                        myapp.getDaoSession().update(img);
+                    }
+                }
+            }
+        } else if (id == R.id.send_log) {
+
+
+            //File logPath = new File(this.getApplicationContext().getFilesDir(), "log_sconfirmei");
+            String nameLog =  myapp.getNameDb().replace(".db","") + "_log_sconfirmei.txt";
+            File fileLog = new File(this.getApplicationContext().getFilesDir(), nameLog );
+            Uri contentUri = PublicFileProvider.getUriForFile(getApplicationContext(),
+                    "com.mydomain.publicfileprovider", fileLog );
+
+
+
+            ///mnt/sdcard/sconfirmei/05137082864_114._log_sconfirmei.txt
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+            shareIntent.setType("text/*");
+
+            //final File file = new File(myapp.getFileLog());
+
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+
+            startActivity(Intent.createChooser(shareIntent, "Compartilhar arquivo usando..."));
+
+
         } else if (id == R.id.config) {
             Intent i = new Intent(getApplicationContext(), SettingsActivityMain.class);
             startActivity(i);
@@ -366,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             showDialog(DATE_DIALOG_ID);
 
         } else if (id == R.id.menu_mapa) {
+
             Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(intent);
 
@@ -669,7 +707,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     }
                 });
 
-
     }
 
 
@@ -690,7 +727,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         @Override
         protected Void doInBackground(Void... voids) {
             //Backup e criação de novo banco de dados
-
 
             String cData = Util.getDateFormatYMD(dateSync);
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());

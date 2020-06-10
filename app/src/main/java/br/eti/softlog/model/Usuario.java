@@ -39,9 +39,22 @@ public class Usuario {
     @Property(nameInDb = "codigo_acesso")
     private int codigoAcesso;
 
-    @Generated(hash = 1388773144)
+    @Property(nameInDb = "last_login")
+    private String lastLogin;
+
+    @Property(nameInDb = "status")
+    private boolean status;
+
+    @Property(nameInDb = "sincronizar")
+    private boolean sincronizar;
+
+    @Property(nameInDb = "uuid")
+    private String uuid;
+
+    @Generated(hash = 1729207166)
     public Usuario(Long id, String nome, String cpf, String login, String senha,
-            String email, String createdAt, String updatedAt, int codigoAcesso) {
+            String email, String createdAt, String updatedAt, int codigoAcesso,
+            String lastLogin, boolean status, boolean sincronizar, String uuid) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
@@ -51,6 +64,10 @@ public class Usuario {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.codigoAcesso = codigoAcesso;
+        this.lastLogin = lastLogin;
+        this.status = status;
+        this.sincronizar = sincronizar;
+        this.uuid = uuid;
     }
 
     @Generated(hash = 562950751)
@@ -136,6 +153,38 @@ public class Usuario {
         } else {
             return false;
         }
+    }
+
+    public String getLastLogin() {
+        return this.lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public boolean getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public boolean getSincronizar() {
+        return this.sincronizar;
+    }
+
+    public void setSincronizar(boolean sincronizar) {
+        this.sincronizar = sincronizar;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
 }

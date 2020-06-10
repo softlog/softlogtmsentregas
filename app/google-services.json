@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "32169373069",
+    "firebase_url": "https://sconfirmei.firebaseio.com",
+    "project_id": "sconfirmei",
+    "storage_bucket": "sconfirmei.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32169373069:android:460fbe701052d2e783a1c4",
+        "android_client_info": {
+          "package_name": "br.eti.softlog.softlogtmsentregas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32169373069-erg6n28596741jgrrbc2hvtv5l6gjj07.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.eti.softlog.softlogtmsentregas",
+            "certificate_hash": "a28ec9e2393607a064c150292000f98f4af6e2b6"
+          }
+        },
+        {
+          "client_id": "32169373069-me8t7bvskkj39rets681bkcv638n1mus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmnSiwukZWT08i0nGDWSoMCFZ_VaBu6Z8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32169373069-me8t7bvskkj39rets681bkcv638n1mus.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

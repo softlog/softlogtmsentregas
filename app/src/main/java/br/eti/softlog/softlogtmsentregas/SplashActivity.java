@@ -2,10 +2,10 @@ package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.idescout.sql.SqlScoutServer;
+
 
 //import br.eti.softlog.whenmoving.MainTrackingActivity;
 
@@ -19,7 +19,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        SqlScoutServer.create(this, getPackageName());
+
 
         new Handler().postDelayed(new Runnable() {
             /*

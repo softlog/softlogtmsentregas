@@ -1,7 +1,6 @@
 package br.eti.softlog.softlogtmsentregas;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -10,16 +9,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -28,26 +23,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import br.eti.softlog.Fragments.TimePickerFragment;
 import br.eti.softlog.model.Documento;
-import br.eti.softlog.model.ImagemOcorrencia;
 import br.eti.softlog.model.Ocorrencia;
 import br.eti.softlog.model.OcorrenciaDocumento;
 import br.eti.softlog.utils.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import br.eti.softlog.softlogtmsentregas.R;
-import butterknife.internal.Utils;
 import im.delight.android.location.SimpleLocation;
 
 
@@ -104,6 +91,11 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_ocorrencias);
         ButterKnife.bind(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle("Registro Entrega");
+
         app = (EntregasApp)getApplicationContext();
         util = new Util();
 
@@ -190,6 +182,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
                 i.putExtra("longitude",longitude);
 
                 startActivity(i);
+                finish();
 
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -215,6 +208,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
 
                         startActivity(i);
                         dialog.dismiss();
+                        finish();
 
                         // Do nothing but close the dialog
                     }
@@ -259,7 +253,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
 
                         Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
                         startActivity(mainIntent);
-
+                        finish();
                         // Do nothing
                         dialog.dismiss();
 
@@ -307,6 +301,20 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
                 }
     };
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent i = new Intent(getApplicationContext(), DocumentoActivity.class);
 
+        i.putExtra("id_documento",idDocumento);
+
+        startActivity(i);
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        onSupportNavigateUp();
+    }
 
 }

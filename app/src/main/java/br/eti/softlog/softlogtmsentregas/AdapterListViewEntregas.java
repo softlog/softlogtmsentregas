@@ -23,10 +23,12 @@ public class AdapterListViewEntregas extends BaseAdapter {
 
     private final List<Documento> documentos;
     private final Activity act;
+    private EntregasApp app;
 
-    public AdapterListViewEntregas(List<Documento> documentos, Activity act) {
+    public AdapterListViewEntregas(List<Documento> documentos, Activity act, EntregasApp app) {
         this.documentos = documentos;
         this.act = act;
+        this.app = app;
     }
 
     @Override
@@ -124,7 +126,10 @@ public class AdapterListViewEntregas extends BaseAdapter {
             if (doc.getOcorrencia().getPendencia()){
                 txtColor.setBackgroundColor(Color.RED);
             } else if (doc.getOcorrencia().getId() > 0) {
-                txtColor.setBackgroundColor(Color.GREEN);
+                if (app.getModoDaltonico())
+                    txtColor.setBackgroundColor(Color.BLUE);
+                else
+                    txtColor.setBackgroundColor(Color.GREEN);
             } else {
                 txtColor.setBackgroundColor(Color.YELLOW);
             }

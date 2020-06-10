@@ -32,15 +32,25 @@
         android:title="Sincronizar dados"
         app:showAsAction="never" />
 
+    <item android:id="@+id/reenvio_imagens"
+        android:title="Reenviar todas imagens"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/menu_mapa"
         android:icon="@drawable/ic_map"
         android:title="Google Maps"
         app:showAsAction="never" />
 
+    <item android:id="@+id/send_log"
+        android:title="Compartilhar Log"
+        app:showAsAction="never" />
+
+
     <item android:id="@+id/config"
         android:title="@string/config"
         app:showAsAction="never" />
+
 
     <item android:id="@+id/exit"
         android:title="@string/exit"

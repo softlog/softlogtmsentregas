@@ -2,6 +2,7 @@ package br.eti.softlog.softlogtmsentregas;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -11,17 +12,19 @@ import android.location.Location;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.support.multidex.MultiDexApplication;
+
 import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
-import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.Geofence;
+import com.pixplicity.easyprefs.library.Prefs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 
+import androidx.multidex.MultiDexApplication;
 import br.eti.softlog.model.DaoMaster;
 import br.eti.softlog.model.DaoSession;
 import br.eti.softlog.model.DatabaseUpgradeHelper;
@@ -45,7 +48,10 @@ public class EntregasApp extends MultiDexApplication {
     private Date data_corrente;
     private int tipoStatus;
     private String nameDb;
+    private String fileLog;
 
+    private static final boolean DEBUG = true;
+    public static final String TAG = "EntregasApp";
 
     protected static SharedPreferences sharedPreferences;
 
@@ -71,7 +77,15 @@ public class EntregasApp extends MultiDexApplication {
 
 
 
-         Utils.init(this);
+        Utils.init(this);
+
+
+        new Prefs.Builder()
+                .setContext(this)
+                .setMode(ContextWrapper.MODE_PRIVATE)
+                .setPrefsName(getPackageName())
+                .setUseDefaultSharedPreference(true)
+                .build();
 
         singleton = this;
         tipoStatus = 1;
@@ -89,7 +103,13 @@ public class EntregasApp extends MultiDexApplication {
             Usuario usuario = this.mDaoSession.getUsuarioDao().queryBuilder()
                     .where(UsuarioDao.Properties.Cpf.eq(login)).unique();
 
+
             if (!(usuario == null)){
+                if (usuario.getUuid()==null){
+                    usuario.setUuid(getUUID());
+                    this.getDaoSession().update(usuario);
+                }
+
                 this.setUsuario(usuario);
             }
         } else {
@@ -106,6 +126,11 @@ public class EntregasApp extends MultiDexApplication {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("pref_onoff", false);
         editor.commit();
+
+
+
+        //initLogManager();// init LogManager before you use it to print log
+        //LogUtil.writeLogs(DEBUG);
 
         //mDaoSession = new DaoMaster(new DaoMaster.DevOpenHelper(this, "conference.db").getWritableDb()).newSession();
     }
@@ -151,6 +176,36 @@ public class EntregasApp extends MultiDexApplication {
         DaoMaster daoMaster = new DaoMaster(db);
         mDaoSession = daoMaster.newSession();
         nameDb = nome_bd;
+
+        String dirMain = getApplicationContext().getFilesDir().toString();
+
+        File folder = new File(dirMain);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+        folder = null;
+
+        fileLog = dirMain + "/" + nameDb.replace(".db","") + "_log_sconfirmei.txt";
+        File logFile = new File(fileLog);
+
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        logFile = null;
+    }
+
+    public String getFileLog(){
+        return fileLog;
     }
 
     public static boolean doesDatabaseExist(Context context, String dbName) {
@@ -169,6 +224,12 @@ public class EntregasApp extends MultiDexApplication {
         }
         return p.applicationInfo.dataDir;
     }
+
+
+    public String getUUID(){
+        return UUID.randomUUID().toString();
+    }
+
 
     public DaoSession getDaoSession() {
         return mDaoSession;
@@ -352,6 +413,21 @@ public class EntregasApp extends MultiDexApplication {
         return r;
     }
 
+    public boolean getModoConsulta() {
+        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
+        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
+        //Using getXXX- with XX is type date you wrote to file "name_file"
+        boolean modoConsulta = shared.getBoolean("modo_consulta",false);
+        return modoConsulta;
+    }
+
+    public boolean getModoDaltonico() {
+        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
+        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
+        //Using getXXX- with XX is type date you wrote to file "name_file"
+        boolean modoDaltonico = shared.getBoolean("modo_daltonico",false);
+        return modoDaltonico;
+    }
 
 
     @Override
@@ -367,11 +443,5 @@ public class EntregasApp extends MultiDexApplication {
     public static SharedPreferences getSharedPreferences() {
         return sharedPreferences;
     }
-
-
-
-
-
-
 
 }

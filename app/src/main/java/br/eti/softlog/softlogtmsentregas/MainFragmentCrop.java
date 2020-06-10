@@ -6,15 +6,15 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import br.eti.softlog.softlogtmsentregas.R;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -32,6 +32,7 @@ public final class MainFragmentCrop extends Fragment
     private String observacao;
     private Double latitude;
     private Double longitude;
+    private Long idImagem;
     // region: Fields and Consts
 
     private CropDemoPreset mDemoPreset;
@@ -39,8 +40,9 @@ public final class MainFragmentCrop extends Fragment
     private CropImageView mCropImageView;
     // endregion
 
-    /** Returns a new instance of this fragment for the given section number. */
-    public static MainFragmentCrop newInstance(CropDemoPreset demoPreset) {
+    /** Returns a new instance of this fragment for the given section number.
+     * @return*/
+    public static Fragment newInstance(CropDemoPreset demoPreset) {
         MainFragmentCrop fragment = new MainFragmentCrop();
         Bundle args = new Bundle();
         args.putString("DEMO_PRESET", demoPreset.name());
@@ -82,6 +84,7 @@ public final class MainFragmentCrop extends Fragment
     }
 
     public void updateCurrentCropViewOptions() {
+
         CropImageViewOptions options = new CropImageViewOptions();
         options.scaleType = mCropImageView.getScaleType();
         options.cropShape = mCropImageView.getCropShape();
@@ -94,6 +97,7 @@ public final class MainFragmentCrop extends Fragment
         options.maxZoomLevel = mCropImageView.getMaxZoom();
         options.flipHorizontally = mCropImageView.isFlippedHorizontally();
         options.flipVertically = mCropImageView.isFlippedVertically();
+        mCropImageView.setCropRect(mCropImageView.getWholeImageRect());
         ((MainActivityCrop) getActivity()).setCurrentOptions(options);
     }
 
@@ -134,6 +138,7 @@ public final class MainFragmentCrop extends Fragment
         observacao = ((MainActivityCrop) activity).getObservacao();
         latitude = ((MainActivityCrop) activity).getLatitude();
         longitude = ((MainActivityCrop) activity).getLongitude();
+        idImagem = ((MainActivityCrop) activity).getIdImagem();
 
 
 
@@ -220,9 +225,12 @@ public final class MainFragmentCrop extends Fragment
     }
 
     private void handleCropResult(CropImageView.CropResult result) {
+
         if (result.getError() == null) {
             Intent intent = new Intent(getActivity(), CropResultActivity.class);
+
             intent.putExtra("SAMPLE_SIZE", result.getSampleSize());
+
             if (result.getUri() != null) {
                 intent.putExtra("URI", result.getUri());
             } else {
@@ -242,10 +250,10 @@ public final class MainFragmentCrop extends Fragment
             intent.putExtra("observacao",observacao);
             intent.putExtra("latitude",latitude);
             intent.putExtra("longitude",longitude);
+            intent.putExtra("id_imagem",idImagem);
 
             //startActivityForResult(intent,321);
             startActivity(intent);
-
 
         } else {
             //Log.e("AIC", "Failed to crop image", result.getError());

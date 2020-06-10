@@ -1,23 +1,13 @@
 package br.eti.softlog.softlogtmsentregas;
 
-import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
+
 import android.os.Bundle;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import androidx.fragment.app.FragmentActivity;
 
-import java.util.List;
+public class MapsActivity extends FragmentActivity {
 
-import br.eti.softlog.model.Documento;
-
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
-    private GoogleMap mMap;
+    //private GoogleMap mMap;
     Double latitude;
     Double longitude;
     boolean multi;
@@ -29,6 +19,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        /*
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -42,6 +33,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             multi = true;
         else
             multi = false;
+
+         */
+
     }
 
     /**
@@ -53,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    /*
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -94,4 +89,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
+     */
 }

@@ -7,9 +7,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -21,7 +21,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -67,7 +66,7 @@ public class LocationService extends Service {
         // Check whether location settings are satisfied
         // https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
         mSettingsClient = LocationServices.getSettingsClient(this);
-        startLocationUpdates();
+       //startLocationUpdates();
         // getLastLocation();
     }
 
@@ -113,12 +112,12 @@ public class LocationService extends Service {
                 int statusCode = ((ApiException) e).getStatusCode();
                 switch (statusCode) {
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        broadcastIntent.putExtra(GPS_NOT_ENABLED, mLocationRequest);
-                        sendBroadcast(broadcastIntent);
+                        //broadcastIntent.putExtra(GPS_NOT_ENABLED, mLocationRequest);
+                        //sendBroadcast(broadcastIntent);
                         //Log.e(TAG, "Location settings are not satisfied. Attempting to upgrade location settings ");
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        String errorMessage = "Location settings are inadequate, and cannot be fixed here. Fix in Settings.";
+                        //String errorMessage = "Location settings are inadequate, and cannot be fixed here. Fix in Settings.";
                         //Log.e(TAG, errorMessage);
                         break;
 
@@ -141,8 +140,8 @@ public class LocationService extends Service {
         // Create the location request to start receiving updates
         mLocationRequest = new LocationRequest();
         int period = myapp.getConfigIntervalTracking() * 60 * 1000 ;
-        mLocationRequest.setInterval(period);
-        mLocationRequest.setFastestInterval(period);
+        //mLocationRequest.setInterval(period);
+        //mLocationRequest.setFastestInterval(period);
         /*
          * PRIORITIES
          * PRIORITY_BALANCED_POWER_ACCURACY -
@@ -150,7 +149,7 @@ public class LocationService extends Service {
          * PRIORITY_LOW_POWER -
          * PRIORITY_NO_POWER -
          * */
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        //mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void buildLocationSettingsRequest() {
@@ -176,7 +175,7 @@ public class LocationService extends Service {
 
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            onLocationChanged(locationResult.getLastLocation());
+           // onLocationChanged(locationResult.getLastLocation());
         }
     };
 

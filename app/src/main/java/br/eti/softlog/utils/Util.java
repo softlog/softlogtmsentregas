@@ -1,14 +1,24 @@
 package br.eti.softlog.utils;
 
+import android.content.Intent;
 import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
 
+import com.pixplicity.easyprefs.library.Prefs;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.blankj.utilcode.util.ActivityUtils.startActivity;
 
 /**
  * Created by Administrador on 2018/03/03.
@@ -102,6 +112,111 @@ public final class Util {
 
         return phrase.toString();
     }
+
+    public void appendLog(String text, String pathFile)
+    {
+
+
+
+        if (!Prefs.getBoolean("modo_debug",false)){
+            return ;
+        }
+
+
+        File logFile = new File(pathFile);
+
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(getDateTimeFormatYMD(new Date()) + "\t" + text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    public void appendLog(String tag, String text, String pathFile)
+    {
+
+        if (!Prefs.getBoolean("modo_debug",false)){
+            return ;
+        }
+
+        File logFile = new File(pathFile);
+
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(getDateTimeFormatYMD(new Date()) + "\t" + tag + "\t" + text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    public void sendLogMail(){
+
+        // save logcat in file
+        File outputFile = new File("/sdcard/sconfirmei/log_sconfirmei.txt");
+        /*
+        try {
+            Runtime.getRuntime().exec(
+                    "logcat -f " + outputFile.getAbsolutePath());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        */
+
+        //send file using email
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+
+        // Set type to "email"
+        emailIntent.setType("vnd.android.cursor.dir/email");
+        String to[] = {"paulo.sergio.softlog@gmail.com"};
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
+
+        // the attachment
+        emailIntent.putExtra(Intent.EXTRA_STREAM, outputFile.getAbsolutePath());
+
+        // the mail subject
+        emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Log do Aplicativo de Entregas SConfirmei");
+        startActivity(Intent.createChooser(emailIntent , "Envio de Email..."));
+
+    }
+
 
 }
 
