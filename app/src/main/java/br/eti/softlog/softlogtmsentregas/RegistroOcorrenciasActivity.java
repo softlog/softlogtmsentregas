@@ -305,7 +305,7 @@ public class RegistroOcorrenciasActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         Intent i = new Intent(getApplicationContext(), DocumentoActivity.class);
 
-        i.putExtra("id_documento",idDocumento);
+        i.putExtra("id_documento", String.valueOf(idDocumento));
 
         startActivity(i);
         finish();

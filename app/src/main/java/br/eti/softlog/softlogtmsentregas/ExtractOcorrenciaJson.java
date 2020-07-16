@@ -36,6 +36,9 @@ public class ExtractOcorrenciaJson {
                 String ocorrenciaDesc = ocorrencia.getString("ocorrencia");
                 int pendencia = ocorrencia.getInt("pendencia");
                 int ativo = ocorrencia.getInt("aplicativo_mobile");
+                int exigeRecebedor = ocorrencia.getInt("exige_recebedor");
+                int exigeDocumento = ocorrencia.getInt("exige_documento");
+                int exigeImagem = ocorrencia.getInt("exige_imagem");
 
                 boolean bPendencia;
 
@@ -51,7 +54,29 @@ public class ExtractOcorrenciaJson {
                 else
                     bAtivo = false;
 
-                manager.addOcorrencia(idOcorrencia,ocorrenciaDesc,bPendencia, bAtivo);
+                boolean bExigeRecebedor;
+
+                if (exigeRecebedor == 1)
+                    bExigeRecebedor = true;
+                else
+                    bExigeRecebedor = false;
+
+                boolean bExigeDocumento;
+
+                if (exigeDocumento == 1)
+                    bExigeDocumento = true;
+                else
+                    bExigeDocumento = false;
+
+                boolean bExigeImagem;
+
+                if (exigeImagem == 1)
+                    bExigeImagem = true;
+                else
+                    bExigeImagem = false;
+
+                manager.addOcorrencia(idOcorrencia,ocorrenciaDesc,bPendencia, bAtivo,
+                        bExigeRecebedor, bExigeDocumento, bExigeImagem);
 
             }
 

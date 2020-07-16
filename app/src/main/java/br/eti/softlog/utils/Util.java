@@ -113,7 +113,7 @@ public final class Util {
         return phrase.toString();
     }
 
-    public void appendLog(String text, String pathFile)
+    public static void appendLog(String text, String pathFile)
     {
 
 
@@ -151,7 +151,7 @@ public final class Util {
             e.printStackTrace();
         }
     }
-    public void appendLog(String tag, String text, String pathFile)
+    public static void appendLog(String tag, String text, String pathFile)
     {
 
         if (!Prefs.getBoolean("modo_debug",false)){

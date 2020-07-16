@@ -173,7 +173,10 @@ public class DocumentoActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_documento, menu);
 
-        if (!doc.getOcorrencia().getPendencia() && doc.getOcorrencia().getId()>0){
+        if (!doc.getOcorrencia().getPendencia()
+                && doc.getOcorrencia().getId()>0
+                && (doc.getOcorrencia().getId()<300 || doc.getOcorrencia().getId()> 399)
+        ) {
             menu.getItem(0).setVisible(false);
             menu.getItem(1).setVisible(false);
         }
@@ -243,7 +246,7 @@ public class DocumentoActivity extends AppCompatActivity {
             }
         }
         else if (id == R.id.menu_mapa){
-            Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+            Intent i = new Intent(getApplicationContext(),MapasEntrega2.class);
 
             if (doc.getDestinatario().getLatitude() != null) {
                 Double latitude = Double.valueOf(doc.getDestinatario().getLatitude());

@@ -1,17 +1,26 @@
 package br.eti.softlog.softlogtmsentregas;
 
+import androidx.fragment.app.FragmentActivity;
+import br.eti.softlog.model.Documento;
 
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import androidx.fragment.app.FragmentActivity;
-import br.eti.softlog.model.Documento;
+import java.util.List;
 
-public class MapsActivity extends FragmentActivity {
+public class MapasEntrega2 extends FragmentActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
 
     //private GoogleMap mMap;
     Double latitude;
@@ -20,15 +29,16 @@ public class MapsActivity extends FragmentActivity {
     EntregasApp myapp;
     Manager manager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_mapas_entrega2);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
         Intent i = getIntent();
 
@@ -40,7 +50,6 @@ public class MapsActivity extends FragmentActivity {
         else
             multi = false;
 
-         */
 
     }
 
@@ -53,7 +62,6 @@ public class MapsActivity extends FragmentActivity {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    /*
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -87,16 +95,31 @@ public class MapsActivity extends FragmentActivity {
                     }
 
                     mMap.addMarker(new MarkerOptions().position(localEntrega)
-                        .title(documento.getDestinatario().getNome()));
+                            .title(documento.getDestinatario().getNome()));
                 }
             }
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(primeiraEntrega, 14));
+            mMap.setMyLocationEnabled(true);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(primeiraEntrega, 10));
+
+            // Check if we were successful in obtaining the map.
+            /*
+            if (mMap != null) {
+                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationChangeListener() {
+                    @Override
+                    public void onMyLocationChange(Location arg0) {
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.truck);
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("Minha Localização").icon(icon));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 6));
+                    }
+                });
+
+
+            }
+
+             */
+
         }
 
     }
-
-     */
-
-
 }

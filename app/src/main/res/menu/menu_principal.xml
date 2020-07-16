@@ -46,6 +46,10 @@
         android:title="Compartilhar Log"
         app:showAsAction="never" />
 
+    <item android:id="@+id/send_db"
+        android:title="Compartilhar Banco de Dados"
+        app:showAsAction="never" />
+
 
     <item android:id="@+id/config"
         android:title="@string/config"

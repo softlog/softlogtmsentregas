@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -20,7 +21,12 @@ import com.blankj.utilcode.util.Utils;
 import com.pixplicity.easyprefs.library.Prefs;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.UUID;
 
@@ -30,6 +36,7 @@ import br.eti.softlog.model.DaoSession;
 import br.eti.softlog.model.DatabaseUpgradeHelper;
 import br.eti.softlog.model.Usuario;
 import br.eti.softlog.model.UsuarioDao;
+import br.eti.softlog.utils.Util;
 
 
 /**
@@ -105,11 +112,6 @@ public class EntregasApp extends MultiDexApplication {
 
 
             if (!(usuario == null)){
-                if (usuario.getUuid()==null){
-                    usuario.setUuid(getUUID());
-                    this.getDaoSession().update(usuario);
-                }
-
                 this.setUsuario(usuario);
             }
         } else {
@@ -353,7 +355,7 @@ public class EntregasApp extends MultiDexApplication {
         //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
         SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
         //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean r = shared.getBoolean("download_mobile",false);
+        boolean r = shared.getBoolean("download_mobile",true);
         return r;
     }
 
@@ -429,7 +431,47 @@ public class EntregasApp extends MultiDexApplication {
         return modoDaltonico;
     }
 
+    public boolean backupBD(Context context, String nome_bd) {
 
+
+        String dirBackup = Environment.getExternalStorageDirectory() + "/sconfirmei";
+
+        //String dirBackup = dirMain + "/backup";
+        File folderBackup = new File(dirBackup);
+        if (!folderBackup.exists()) {
+            folderBackup.mkdir();
+        }
+
+
+        Date date = new Date();
+        String cDate = Util.getDateTimeFormatYMD(date);
+
+        //Código de Backup
+        try {
+            // Caminho de Origem do Seu Banco de Dados
+            InputStream in = new FileInputStream(
+                    new File(String.valueOf(context.getDatabasePath(nome_bd))));
+
+            // Caminho de Destino do Backup do Seu Banco de Dados
+            OutputStream out = new FileOutputStream(new File(
+                    dirBackup + "/" + nome_bd));
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            Log.d("Backup DB",e.getMessage());
+            return false;
+        } catch (IOException e) {
+            Log.d("Backup DB",e.getMessage());
+            return false;
+        }
+        return true;
+    }
     @Override
     public void onLowMemory() {
         super.onLowMemory();

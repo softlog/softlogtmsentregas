@@ -101,6 +101,8 @@ public class Documento {
     @Property(nameInDb = "tempo_estimado")
     private Double tempoEstimado;
 
+    @Property(nameInDb = "cep")
+    private String cep;
 
 /** Used to resolve relations */
 @Generated(hash = 2040040024)
@@ -110,12 +112,14 @@ private transient DaoSession daoSession;
 @Generated(hash = 177588185)
 private transient DocumentoDao myDao;
 
-@Generated(hash = 535456813)
-public Documento(Long id, Long idNotaFiscalImp, String dataEmissao, String dataExpedicao,
-        String chaveNfe, String serie, String numeroNotaFiscal, Long remetenteCnpj,
-        Long destinatarioCnpj, Long romaneioId, Double valor, Double peso, Double volumes,
-        Long idOcorrencia, String dataOcorrencia, Long idConhecimentoNotasFiscais,
-        Long idConhecimento, Double distance, Double tempoEstimado) {
+@Generated(hash = 1692362587)
+public Documento(Long id, Long idNotaFiscalImp, String dataEmissao,
+        String dataExpedicao, String chaveNfe, String serie,
+        String numeroNotaFiscal, Long remetenteCnpj, Long destinatarioCnpj,
+        Long romaneioId, Double valor, Double peso, Double volumes,
+        Long idOcorrencia, String dataOcorrencia,
+        Long idConhecimentoNotasFiscais, Long idConhecimento, Double distance,
+        Double tempoEstimado, String cep) {
     this.id = id;
     this.idNotaFiscalImp = idNotaFiscalImp;
     this.dataEmissao = dataEmissao;
@@ -135,6 +139,7 @@ public Documento(Long id, Long idNotaFiscalImp, String dataEmissao, String dataE
     this.idConhecimento = idConhecimento;
     this.distance = distance;
     this.tempoEstimado = tempoEstimado;
+    this.cep = cep;
 }
 
 @Generated(hash = 2067782857)
@@ -275,6 +280,30 @@ public Long getIdConhecimento() {
 
 public void setIdConhecimento(Long idConhecimento) {
     this.idConhecimento = idConhecimento;
+}
+
+public Double getDistance() {
+    return this.distance;
+}
+
+public void setDistance(Double distance) {
+    this.distance = distance;
+}
+
+public Double getTempoEstimado() {
+    return this.tempoEstimado;
+}
+
+public void setTempoEstimado(Double tempoEstimado) {
+    this.tempoEstimado = tempoEstimado;
+}
+
+public String getCep() {
+    return this.cep;
+}
+
+public void setCep(String cep) {
+    this.cep = cep;
 }
 
 @Generated(hash = 603090513)
@@ -474,27 +503,13 @@ public void update() {
     myDao.update(this);
 }
 
-public Double getDistance() {
-    return this.distance;
-}
-
-public void setDistance(Double distance) {
-    this.distance = distance;
-}
-
-public Double getTempoEstimado() {
-    return this.tempoEstimado;
-}
-
-public void setTempoEstimado(Double tempoEstimado) {
-    this.tempoEstimado = tempoEstimado;
-}
-
 /** called by internal mechanisms, do not call yourself. */
 @Generated(hash = 745708422)
 public void __setDaoSession(DaoSession daoSession) {
     this.daoSession = daoSession;
     myDao = daoSession != null ? daoSession.getDocumentoDao() : null;
 }
+
+
 
 }

@@ -1,4 +1,4 @@
-<androidx.appcompat.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,7 +8,7 @@
     android:layout_marginRight="5dp"
     card_view:cardCornerRadius="5dp">
 
-    <androidx.constraintlayout.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginRight="16dp"
@@ -87,7 +87,6 @@
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.ConstraintLayout>
-
-</androidx.appcompat.widget.CardView>
+</androidx.cardview.widget.CardView>

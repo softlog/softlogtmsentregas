@@ -2,9 +2,10 @@ package br.eti.softlog.softlogtmsentregas;
 
 import android.content.Intent;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 
 //import br.eti.softlog.whenmoving.MainTrackingActivity;
@@ -31,7 +32,15 @@ public class SplashActivity extends AppCompatActivity {
                 // E inicia a activity principal
                 myapp = (EntregasApp)getApplicationContext();
 
+                if(myapp.getStatus()){
+                    if (myapp.getUsuario().getUuid() == null){
+                        myapp.logout();
+                    } else if (myapp.getUsuario().getUuid().isEmpty()){
+                        myapp.logout();
+                    }
+                }
                 if (myapp.getStatus()) {
+
                     Intent i = new Intent(SplashActivity.this,MainActivity.class );
                     //Intent i = new Intent(SplashActivity.this,PrincipalActivity.class );
                     //Intent i = new Intent(SplashActivity.this,MainActivityFreeTrackGps.class );

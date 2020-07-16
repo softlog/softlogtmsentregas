@@ -64,12 +64,16 @@ public class BarCode2Activity extends AppCompatActivity implements BarcodeReader
 
                 String chaveNfe = barcode.displayValue;
                 if (chaveNfe.length()==44){
-                    Documento documento = manager.findDocumentoByChaveNFeAberta(chaveNfe);
+                    Documento documento = manager.findDocumentoByChaveNFeDataRomaneio(chaveNfe,app.getDate());
                     if (documento != null){
                         Intent i = new Intent(getApplicationContext(),DocumentoActivity.class);
                         i.putExtra("id_documento",documento.getId().toString());
                         startActivity(i);
                         finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Documento não encontrado!",
+                                Toast.LENGTH_LONG).show();
+
                     }
 
                 }

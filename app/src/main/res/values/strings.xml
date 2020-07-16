@@ -234,6 +234,7 @@
     <string name="title_activity_maps_route">Map</string>
     <string name="title_activity_ocorrencias_list">OcorrenciasListActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_mapas_entrega2">Map</string>
     <string-array name="pref_intervalLabels">
         <item>10 seconds</item>
         <item>20 seconds</item>
@@ -245,6 +246,7 @@
         <item>80 seconds</item>
         <item>90 seconds</item>
     </string-array>
+
     <string-array name="pref_intervalValues">
         <item>10</item>
         <item>20</item>
@@ -256,7 +258,6 @@
         <item>80</item>
         <item>90</item>
     </string-array>
-
     <string-array name="pref_thresholdValues">
         <item>0.05</item>
         <item>0.10</item>

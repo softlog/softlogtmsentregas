@@ -98,6 +98,9 @@ public class ExtractRomaneioJson {
                 String ocorrenciaDesc = ocorrencia.getString("ocorrencia");
                 int pendencia = ocorrencia.getInt("pendencia");
                 int ativo = ocorrencia.getInt("aplicativo_mobile");
+                int exigeRecebedor = ocorrencia.getInt("exige_recebedor");
+                int exigeDocumento = ocorrencia.getInt("exige_documento");
+                int exigeImagem = ocorrencia.getInt("exige_imagem");
 
                 boolean bPendencia;
 
@@ -113,7 +116,29 @@ public class ExtractRomaneioJson {
                 else
                     bAtivo = false;
 
-                manager.addOcorrencia(idOcorrencia,ocorrenciaDesc,bPendencia, bAtivo);
+                boolean bExigeRecebedor;
+
+                if (exigeRecebedor == 1)
+                    bExigeRecebedor = true;
+                else
+                    bExigeRecebedor = false;
+
+                boolean bExigeDocumento;
+
+                if (exigeDocumento == 1)
+                    bExigeDocumento = true;
+                else
+                    bExigeDocumento = false;
+
+                boolean bExigeImagem;
+
+                if (exigeImagem == 1)
+                    bExigeImagem = true;
+                else
+                    bExigeImagem = false;
+
+                manager.addOcorrencia(idOcorrencia,ocorrenciaDesc,bPendencia, bAtivo,
+                        bExigeRecebedor, bExigeRecebedor, bExigeImagem);
 
             }
 
@@ -177,6 +202,7 @@ public class ExtractRomaneioJson {
                     Double volumes = documento.getDouble("volume");
                     Long idOcorrencia = documento.getLong("id_ocorrencia");
                     String dataOcorrencia1 = documento.getString("data_ocorrencia");
+                    String cep = documento.getString("cep");
                     String dataOcorrencia;
 
                     Long idConhecimentoNotasFiscais;
@@ -204,7 +230,7 @@ public class ExtractRomaneioJson {
                             chaveNfe,serie,numeroNotaFiscal,remetenteCnpj,
                             destinatarioCnpj,romaneioId,valor,peso,volumes,
                             idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
-                            idConhecimento, 0.0, 0.0);
+                            idConhecimento, 0.0, 0.0, cep);
 
                 }
             }

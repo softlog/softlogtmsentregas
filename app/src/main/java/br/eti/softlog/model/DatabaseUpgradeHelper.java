@@ -39,6 +39,8 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         migrations.add(new MigrationV10());
         migrations.add(new MigrationV11());
         migrations.add(new MigrationV13());
+        migrations.add(new MigrationV14());
+        migrations.add(new MigrationV17());
 
 
         // Sorting just to be safe, in case other people add migrations in the wrong order.
@@ -162,6 +164,53 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         }
     }
 
+    private static class MigrationV14 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 14;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            db.execSQL("ALTER TABLE " + OcorrenciaDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDao.Properties.ExigeRecebedor.columnName + " INTEGER");
+            db.execSQL("ALTER TABLE " + OcorrenciaDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDao.Properties.ExigeDocumento.columnName + " INTEGER");
+            db.execSQL("ALTER TABLE " + OcorrenciaDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDao.Properties.ExigeImagem.columnName + " INTEGER");
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
+
+    private static class MigrationV16 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 16;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
+    private static class MigrationV17 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 17;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            db.execSQL("ALTER TABLE " + DocumentoDao.TABLENAME + " ADD COLUMN " +  DocumentoDao.Properties.Cep.columnName + " TEXT");
+            //UsuarioDao.createTable(db, false);
+        }
+    }
 
     private interface Migration {
         Integer getVersion();

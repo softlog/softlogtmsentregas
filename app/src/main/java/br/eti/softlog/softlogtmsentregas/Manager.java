@@ -3,6 +3,8 @@ package br.eti.softlog.softlogtmsentregas;
 import android.content.Context;
 import android.util.Log;
 
+import com.pixplicity.easyprefs.library.Prefs;
+
 import org.greenrobot.greendao.query.Join;
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -82,8 +84,6 @@ public class Manager {
         }
     }
 
-
-
     public Cidade findCidadeById(Long id){
         return app.getDaoSession().getCidadeDao().queryBuilder().where(CidadeDao.Properties.Id.eq(id)).unique();
     }
@@ -103,16 +103,20 @@ public class Manager {
         return app.getDaoSession().getOcorrenciaDao().queryBuilder().where(OcorrenciaDao.Properties.Id.eq(id)).unique();
     }
 
-    public Ocorrencia addOcorrencia(Long id, String ocorrencia_desc, boolean pendencia, boolean ativo){
+    public Ocorrencia addOcorrencia(Long id, String ocorrencia_desc, boolean pendencia, boolean ativo,
+                                    boolean exigeRecebedor, boolean exigeDocumento, boolean exigeImagem){
 
         Ocorrencia ocorrencia = findOcorrenciaById(id);
         if (ocorrencia == null) {
-            ocorrencia = new Ocorrencia(id,ocorrencia_desc,pendencia,ativo);
+            ocorrencia = new Ocorrencia(id,ocorrencia_desc,pendencia,ativo,false, false, false);
             app.getDaoSession().insert(ocorrencia);
         } else {
             ocorrencia.setOcorrencia(ocorrencia_desc);
             ocorrencia.setPendencia(pendencia);
             ocorrencia.setAtivo(ativo);
+            ocorrencia.setExigeRecebedor(ocorrencia.getExigeRecebedor());
+            ocorrencia.setExigeDocumento(ocorrencia.getExigeDocumento());
+            ocorrencia.setExigeImagem(ocorrencia.getExigeImagem());
             app.getDaoSession().update(ocorrencia);
         }
 
@@ -202,6 +206,10 @@ public class Manager {
                 pessoa.setTelefone(telefone);
                 pessoa.setWhatsapp(whatsapp);
                 app.getDaoSession().update(pessoa);
+            } else if (pessoa.getLatitude() != latitude){
+                pessoa.setLatitude(latitude);
+                pessoa.setLongitude(longitude);
+                app.getDaoSession().update(pessoa);
             }
 
         }
@@ -254,9 +262,9 @@ public class Manager {
             romaneio.setRegiaoId(regiaoId);
             romaneio.setDataExpedicao(dataExpedicao);
             app.getDaoSession().insert(romaneio);
-            //romaneio.set
-
-
+        } else {
+            romaneio.setDataRomaneio(dataRomaneio);
+            app.getDaoSession().update(romaneio);
         }
         return romaneio;
     }
@@ -285,7 +293,50 @@ public class Manager {
         }
     }
 
+    public int getQuantidadeOcorrencias(Date dataExpedicao){
 
+        String data = Util.getDateFormatYMD(dataExpedicao);
+        QueryBuilder query = app.getDaoSession().getDocumentoDao().queryBuilder()
+                .where(DocumentoDao.Properties.IdOcorrencia.gt(0))
+                .whereOr(DocumentoDao.Properties.IdOcorrencia.lt(300),
+                         DocumentoDao.Properties.IdOcorrencia.gt(399));
+
+//        query.LOG_SQL = true;
+//        query.LOG_VALUES = true;
+
+        query.join(DocumentoDao.Properties.RomaneioId,Romaneio.class).
+                where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        //Join pessoas = query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+
+//        query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
+//        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        List<Documento> documentos = query.orderAsc(DocumentoDao.Properties.Distance).list();
+        return documentos.size();
+    }
+
+    public int getQuantidadeDocumentos(Date dataExpedicao){
+
+        String data = Util.getDateFormatYMD(dataExpedicao);
+        QueryBuilder query = app.getDaoSession().getDocumentoDao().queryBuilder();
+//        query.LOG_SQL = true;
+//        query.LOG_VALUES = true;
+
+        query.join(DocumentoDao.Properties.RomaneioId,Romaneio.class).
+                where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+
+        //Join pessoas = query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+
+//        query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
+//        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        List<Documento> documentos = query.orderAsc(DocumentoDao.Properties.Distance).list();
+        return documentos.size();
+    }
 
     public Documento findDocumentoById(Long id){
         return app.getDaoSession().getDocumentoDao().queryBuilder().
@@ -299,6 +350,27 @@ public class Manager {
                 .unique();
     }
 
+    public Documento findDocumentoByChaveNFeDataRomaneio(String chaveNfe, Date dataExpedicao){
+
+
+        String data = Util.getDateFormatYMD(dataExpedicao);
+        Documento documento = app.getDaoSession().getDocumentoDao()
+                .queryBuilder()
+                .where(DocumentoDao.Properties.ChaveNfe.eq(chaveNfe))
+                .orderDesc(DocumentoDao.Properties.Id).limit(1).unique();
+
+//      query.LOG_SQL = true;
+//      query.LOG_VALUES = true;
+        //query.join(DocumentoDao.Properties.RomaneioId,Romaneio.class).
+        //        where(RomaneioDao.Properties.DataExpedicao.eq(data));
+        //Join pessoas = query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
+//        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        return documento;
+
+    }
 
 
     public Documento addDocumento(Long idNotaFiscalImp, String dataEmissao, String dataExpedicao,
@@ -306,7 +378,7 @@ public class Manager {
                                   Long destinatarioCnpj, Long romaneioId, Double valor, Double peso,
                                   Double volumes, Long idOcorrencia, String dataOcorrencia,
                                   Long idConhecimentoNotasFiscais, Long idConhecimento,
-                                  Double distance, Double tempoEstimado) {
+                                  Double distance, Double tempoEstimado, String cep) {
 
 
         Documento documento = new Documento();
@@ -321,9 +393,14 @@ public class Manager {
             documento = new Documento(null,idNotaFiscalImp,dataEmissao,dataExpedicao,chaveNfe,
                      serie,numeroNotaFiscal,remetenteCnpj,destinatarioCnpj,romaneioId,
                          valor,peso,volumes,idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
-                    idConhecimento, distance, tempoEstimado);
+                    idConhecimento, distance, tempoEstimado, cep);
             app.getDaoSession().insert(documento);
         } else {
+
+            if (documento.getCep() == null){
+                documento.setCep(cep);
+                app.getDaoSession().update(documento);
+            }
 
 
             if (app.getModoConsulta()){
@@ -351,6 +428,26 @@ public class Manager {
         return documento;
     }
 
+    public String getUltimaAlteracaoRomaneio(String data){
+        String ultimaAlteracao;
+
+        if (app.getModoConsulta()){
+            ultimaAlteracao = data + " 00:00:00";
+        } else {
+            Romaneio romaneio = app.getDaoSession().getRomaneioDao().queryBuilder()
+                    .where(RomaneioDao.Properties.DataExpedicao.eq(data))
+                    .orderDesc(RomaneioDao.Properties.DataRomaneio).limit(1).unique();
+            if (romaneio==null){
+                ultimaAlteracao = data + " 00:00:00";
+            } else {
+                ultimaAlteracao = romaneio.getDataRomaneio();
+            }
+        }
+
+
+        return ultimaAlteracao;
+    }
+
     public List<Documento> findDocumentoByDataRomaneio(Date data_expedicao){
 
         String data = Util.getDateFormatYMD(data_expedicao);
@@ -367,7 +464,14 @@ public class Manager {
 //        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
 //        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
 
-        List<Documento> documentos = query.orderAsc(DocumentoDao.Properties.Distance).list();
+        List<Documento> documentos;
+
+        if (Prefs.getBoolean("ordernar_distancia",true)){
+             documentos = query.orderAsc(DocumentoDao.Properties.Distance).list();
+        } else {
+            documentos = query.orderAsc(DocumentoDao.Properties.Cep).list();
+        }
+
 //       List<Documento> documentos = query.orderRaw("cep ASC").list();
 
 

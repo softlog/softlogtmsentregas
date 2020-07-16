@@ -7,6 +7,7 @@
       <!--android:key="prefs_notifications"-->
       <!--android:title="Enable Notifications"/>-->
 
+
   <SwitchPreference
    android:defaultValue="false"
    android:key="upload_img_mobile"
@@ -21,7 +22,7 @@
       android:summary="Upload automático de ocorrências de entrega na rede móvel?"/>
 
   <SwitchPreference
-      android:defaultValue="false"
+      android:defaultValue="true"
       android:key="download_mobile"
       android:title="Download na rede móvel?" />
 
@@ -92,6 +93,13 @@
       android:defaultValue="2"
       android:maxLength="2"
       />
+
+  <SwitchPreference
+      android:defaultValue="true"
+      android:key="ordenar_distancia"
+      android:title="Ordenar por Distância"
+      android:summary="Ordenar as entregas por Distância?"/>
+
 
   <Preference
       android:key="@string/send_feedback"

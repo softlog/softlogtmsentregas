@@ -9,14 +9,19 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
@@ -37,15 +42,19 @@ import com.android.volley.toolbox.Volley;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.JsonObject;
 
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.pixplicity.easyprefs.library.Prefs;
 import com.yanzhenjie.permission.Action;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Permission;
 
+import org.greenrobot.greendao.query.QueryBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +68,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import br.eti.softlog.adapters.DataAdapterImagemOcorrencia;
 import br.eti.softlog.model.Documento;
 
 import br.eti.softlog.model.DocumentoDao;
@@ -66,39 +79,44 @@ import br.eti.softlog.model.ImagemOcorrencia;
 import br.eti.softlog.model.OcorrenciaDocumento;
 import br.eti.softlog.model.Pessoa;
 
+import br.eti.softlog.model.Romaneio;
+import br.eti.softlog.model.RomaneioDao;
 import br.eti.softlog.utils.AppSingleton;
 import br.eti.softlog.utils.Connectivity;
+import br.eti.softlog.utils.RecyclerViewClickListener;
 import br.eti.softlog.utils.Util;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.cketti.fileprovider.PublicFileProvider;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 
 public class MainActivity extends AppCompatActivity implements OnLocationUpdatedListener {
 
     EntregasApp myapp;
-    ListView lista_entregas;
+    RecyclerView lista_entregas;
     Manager manager;
     DataSync dataSync2;
     Connectivity connectivity;
     Context context;
     Date dateSync;
     Util util;
+    String chaveNfe;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
     // Inicializar o provedor de credenciais do Amazon Cognito
     CognitoCachingCredentialsProvider credentialsProvider;
 
-    AdapterListViewEntregas adapter;
+    DataAdapterEntregas adapter;
     List<Documento> documentos;
     List<Pessoa> entregas;
 
     ExtractRomaneioJson extractRomaneioJson;
     ExtractOcorrenciaJson extractOcorrenciaJson;
 
-    ProgressBar progressBar;
+    MaterialProgressBar progressBar;
 
     TextView txtDate;
     TextView txtUsuario;
@@ -108,18 +126,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     private int mInterval = 5000; // 5 seconds by default, can be changed later
     private Handler mHandler;
 
-    @OnClick(R.id.btnTodos)
-    void onSubmitTodos() {
-
-        Intent i = new Intent(getApplicationContext(), TakePhotoActivity.class);
-        startActivity(i);
-    }
-
-    @OnClick(R.id.btnConferidos)
-    void onClickConferidos() {
-        Intent i = new Intent(getApplicationContext(), MainActivityCrop.class);
-        startActivity(i);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +138,15 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         myapp = (EntregasApp) getApplicationContext();
         manager = new Manager(myapp);
         util = new Util();
+
+        Intent inCall = getIntent();
+
+        chaveNfe = inCall.getStringExtra("chave_nfe");
+        if (chaveNfe == null){
+            chaveNfe = "";
+        }
+
+        getSupportActionBar().setTitle("Lista Entregas");
 
         extractRomaneioJson = new ExtractRomaneioJson(getApplicationContext());
         extractOcorrenciaJson = new ExtractOcorrenciaJson(getApplicationContext());
@@ -211,22 +226,41 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-
-
         progressBar = findViewById(R.id.pbMain);
-        progressBar = findViewById(R.id.pbMain);
-        progressBar.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
         // myapp.getPathDocs();
 
         documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
 
         lista_entregas = findViewById(R.id.lista_entrega);
-        adapter = new AdapterListViewEntregas(documentos, this, myapp);
+
+        lista_entregas.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        lista_entregas.setLayoutManager(layoutManager);
+
+
+        RecyclerViewClickListener listener = (view, position) -> {
+
+            Documento documento = (Documento) documentos.get(position);
+
+            // cria a intent
+            Intent intent = new Intent(getApplicationContext(), DocumentoActivity.class);
+
+            // seta o parametro do medico a exibir os dados
+            intent.putExtra("id_documento", documento.getId().toString());
+
+            //  chama a Activity que mostra os detalhes
+            startActivity(intent);
+            finish();
+
+        };
+
+
+        adapter = new DataAdapterEntregas(getApplicationContext(), documentos, myapp, listener);
+
         lista_entregas.setAdapter(adapter);
-
         txtDate = findViewById(R.id.txtDate);
-
 
         Date data_corrente = myapp.getDate();
         txtDate.setText(getDateFormat(data_corrente));
@@ -239,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         Intent intentSource = getIntent();
         String flagServico = intentSource.getStringExtra("flagServico");
 
-
         //Inicializa os Servicos
         Intent it = new Intent(this.getApplicationContext(), ServiceMain.class);
         startService(it);
@@ -247,14 +280,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         //Intent it2 = new Intent(this.getApplicationContext(),LocationService.class);
         //startService(it2);
 
-
-        try {
-            getDistanceDuration();
-        } catch (Exception e) {
-
-        }
-
-
+        /*
         lista_entregas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view,
@@ -275,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         });
 
+         */
 //        mHandler = new Handler();
 //        startRepeatingTask();
     }
@@ -298,9 +325,17 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                 try {
 
-                    documentos = myapp.getDaoSession().getDocumentoDao().queryBuilder()
-                    .where(DocumentoDao.Properties.NumeroNotaFiscal.like("%" + query.trim() + "%"))
-                    .list();
+                    chaveNfe = "";
+                    String data = Util.getDateFormatYMD(myapp.getDate());
+
+                    QueryBuilder queryBuilder = myapp.getDaoSession().getDocumentoDao().queryBuilder()
+                    .where(DocumentoDao.Properties.NumeroNotaFiscal.like("%" + query.trim() + "%"));
+
+
+                    //queryBuilder.join(DocumentoDao.Properties.RomaneioId, Romaneio.class).
+                    //        where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+                    documentos  = queryBuilder.orderAsc(DocumentoDao.Properties.RomaneioId).list();
 
                     if (documentos.size()==0){
                         alert("Documento não encontrado");
@@ -309,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     adapter.getData().addAll(documentos);
                     // fire the event
                     adapter.notifyDataSetChanged();
+
 
                 } catch (Exception e) {
                     Log.d("Erro ao converter",e.toString());
@@ -320,7 +356,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 //Log.i("well", " this worked");
                 return false;
             }
@@ -352,13 +387,15 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         } else if (id == R.id.atualizar) {
 
-            documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
+            chaveNfe = "";
+            //documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
             reloadAllData();
             //loadOcorrencias();
             alert("Dados Atualizados.");
 
         } else if (id == R.id.sincronizar) {
-
+            loadOcorrencias();
+            chaveNfe = "";
             this.dataSync(myapp.getDate());
             dataSync2.sendOcorrencias();
             dataSync2.sendImagens();
@@ -378,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
             //File logPath = new File(this.getApplicationContext().getFilesDir(), "log_sconfirmei");
             String nameLog =  myapp.getNameDb().replace(".db","") + "_log_sconfirmei.txt";
-            File fileLog = new File(this.getApplicationContext().getFilesDir(), nameLog );
+            File fileLog = new File(this.getApplicationContext().getFilesDir(), nameLog);
             Uri contentUri = PublicFileProvider.getUriForFile(getApplicationContext(),
                     "com.mydomain.publicfileprovider", fileLog );
 
@@ -395,6 +432,30 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
             startActivity(Intent.createChooser(shareIntent, "Compartilhar arquivo usando..."));
 
+        } else if (id == R.id.send_db) {
+
+
+            //File logPath = new File(this.getApplicationContext().getFilesDir(), "log_sconfirmei");
+            String nameDb =  myapp.getNameDb();
+            myapp.backupBD(getApplicationContext(),nameDb);
+
+            String dirBackup = Environment.getExternalStorageDirectory() + "/sconfirmei";
+            File fileDb = new File(dirBackup, nameDb);
+            Uri contentUri = Uri.fromFile(fileDb);
+
+
+
+            ///mnt/sdcard/sconfirmei/05137082864_114._log_sconfirmei.txt
+            final Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+            shareIntent.setType("application/x-sqlite3");
+
+            //final File file = new File(myapp.getFileLog());
+
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+
+            startActivity(Intent.createChooser(shareIntent, "Compartilhar banco de dados usando..."));
+
 
         } else if (id == R.id.config) {
             Intent i = new Intent(getApplicationContext(), SettingsActivityMain.class);
@@ -404,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         } else if (id == R.id.menu_mapa) {
 
-            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MapasEntrega2.class);
             startActivity(intent);
 
         } else if (id == R.id.exit) {
@@ -468,11 +529,13 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                 public void onDateSet(DatePicker view, int year, int monthOfYear,
                                       int dayOfMonth) {
 
+
                     Date data_corrente = getDate(year, monthOfYear, dayOfMonth);
 
                     String dataExtenso = getDateFormat(data_corrente);
                     txtDate.setText(dataExtenso);
 
+                    chaveNfe = "";
                     myapp.setDate(data_corrente);
 
                     entregas = manager.findPessoasByDataRomaneio(myapp.getDate());
@@ -512,12 +575,27 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     private void reloadAllData() {
         // get new modified random data
         // update data in our adapter
+
         documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
+
+
+        try {
+            getDistanceDuration();
+        } catch (Exception e) {
+            Log.d("erro", e.getMessage());
+        }
+
+
 
         adapter.getData().clear();
         adapter.getData().addAll(documentos);
         // fire the event
         adapter.notifyDataSetChanged();
+
+        progressBar.setMax(manager.getQuantidadeDocumentos(myapp.getDate()));
+        progressBar.setProgress(manager.getQuantidadeOcorrencias(myapp.getDate()));
+
+
     }
 
     private void loadOcorrencias() {
@@ -571,7 +649,9 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
     public void getDistanceDuration() {
 
-
+        if (!Prefs.getBoolean("ordenar_distancia",true)) {
+            return ;
+        }
 
         if (!connectivity.isConnected(getApplicationContext())) {
             return;
@@ -596,14 +676,16 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             // for ActivityCompat#requestPermissions for more details.
             return ;
         }
+
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener((Executor) this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener( this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             Double latitude = location.getLatitude();
                             Double longitude = location.getLongitude();
+                            Log.d("Coordenadas", String.valueOf(latitude));
 
                             final String sLatitude = String.valueOf(latitude);
                             final String sLongitude = String.valueOf(longitude);
@@ -634,6 +716,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
 
                                 if (i == ultimo) {
+
                                     Ion.with(getApplicationContext())
                                             .load(url)
                                             .asJsonObject()
@@ -660,8 +743,10 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                                                         //Log.d("Aviso", "Todos itens enviados para a fila");
 
-                                                    } catch (JSONException e1) {
+                                                    } catch (Exception e1) {
                                                         e1.printStackTrace();
+                                                        doc.setDistance(Double.valueOf("0.00"));
+                                                        doc.setTempoEstimado(Double.valueOf("0.00"));
                                                     }
                                                     // do stuff with the result or error
                                                 }
@@ -692,7 +777,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                                                         myapp.getDaoSession().update(doc);
 
-                                                    } catch (JSONException e1) {
+                                                    } catch (Exception e1) {
                                                         e1.printStackTrace();
                                                         doc.setDistance(Double.valueOf("0.00"));
                                                         doc.setTempoEstimado(Double.valueOf("0.00"));
@@ -704,6 +789,12 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                             }
 
                         }
+
+                        adapter.getData().clear();
+                        adapter.getData().addAll(documentos);
+                        // fire the event
+                        adapter.notifyDataSetChanged();
+
                     }
                 });
 
@@ -734,8 +825,15 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             String codigo_acesso = String.valueOf(myapp.getUsuario().getCodigoAcesso());
             String cpf = myapp.getUsuario().getCpf();
 
+            String uuid = myapp.getUsuario().getUuid();
+            String url = "http://api.softlog.eti.br/api/softlog/romaneio_v2/" + codigo_acesso +
+                    "/" + cData + "/" +  uuid + "/" + manager.getUltimaAlteracaoRomaneio(cData);
+
+            /*
             String url = "http://api.softlog.eti.br/api/softlog/romaneio2/" + codigo_acesso +
                     "/" + cData + "/" + cpf;
+
+             */
 
 
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -744,8 +842,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                         public void onResponse(String response) {
                             extractRomaneioJson.extract(response);
                             reloadAllData();
-                            progressBar.setVisibility(View.INVISIBLE);
-                            progressBar.setVisibility(View.GONE);
+
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -754,8 +851,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     //Log.d("ERRO",error.toString());
                     if (error.networkResponse != null) {
                         reloadAllData();
-                        progressBar.setVisibility(View.INVISIBLE);
-                        progressBar.setVisibility(View.GONE);
                     }
                 }
             });
@@ -789,8 +884,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         @Override
         protected void onPostExecute(Void aVoid) {
             reloadAllData();
-            progressBar.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.GONE);
         }
     }
 

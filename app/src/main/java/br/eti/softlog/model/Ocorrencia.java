@@ -24,13 +24,25 @@ public class Ocorrencia {
     @Property(nameInDb = "ativo")
     private boolean ativo;
 
-    @Generated(hash = 716966030)
-    public Ocorrencia(Long id, String ocorrencia, boolean pendencia,
-            boolean ativo) {
+    @Property(nameInDb = "exige_recebedor")
+    private boolean exigeRecebedor;
+
+    @Property(nameInDb = "exige_documento")
+    private boolean exigeDocumento;
+
+    @Property(nameInDb = "exigeImagem")
+    private boolean exigeImagem;
+
+    @Generated(hash = 1029734719)
+    public Ocorrencia(Long id, String ocorrencia, boolean pendencia, boolean ativo,
+            boolean exigeRecebedor, boolean exigeDocumento, boolean exigeImagem) {
         this.id = id;
         this.ocorrencia = ocorrencia;
         this.pendencia = pendencia;
         this.ativo = ativo;
+        this.exigeRecebedor = exigeRecebedor;
+        this.exigeDocumento = exigeDocumento;
+        this.exigeImagem = exigeImagem;
     }
 
     @Generated(hash = 1820280585)
@@ -73,6 +85,30 @@ public class Ocorrencia {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public boolean getExigeRecebedor() {
+        return this.exigeRecebedor;
+    }
+
+    public void setExigeRecebedor(boolean exigeRecebedor) {
+        this.exigeRecebedor = exigeRecebedor;
+    }
+
+    public boolean getExigeDocumento() {
+        return this.exigeDocumento;
+    }
+
+    public void setExigeDocumento(boolean exigeDocumento) {
+        this.exigeDocumento = exigeDocumento;
+    }
+
+    public boolean getExigeImagem() {
+        return this.exigeImagem;
+    }
+
+    public void setExigeImagem(boolean exigeImagem) {
+        this.exigeImagem = exigeImagem;
     }
 
 }
