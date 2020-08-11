@@ -6,7 +6,9 @@ import android.util.Log;
 import com.pixplicity.easyprefs.library.Prefs;
 
 import org.greenrobot.greendao.query.Join;
+import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.Date;
 import java.util.List;
@@ -43,10 +45,22 @@ public class Manager {
     private EntregasApp app ;
     Util util;
 
+    private Query<Ocorrencia> ocorrenciaQry;
 
     public Manager(EntregasApp myapp){
         app = myapp;
         util = new Util();
+
+        try{
+            ocorrenciaQry = app.getDaoSession().getOcorrenciaDao().queryBuilder()
+                    .where(OcorrenciaDao.Properties.Id.eq(-1))
+                    .limit(1)
+                    .build();
+        } catch (Exception e){
+
+        }
+
+
     }
 
     //Adiciona um usuario, caso ele
@@ -100,7 +114,11 @@ public class Manager {
     }
 
     public Ocorrencia findOcorrenciaById(Long id){
-        return app.getDaoSession().getOcorrenciaDao().queryBuilder().where(OcorrenciaDao.Properties.Id.eq(id)).unique();
+
+        ocorrenciaQry.setParameter(0,id);
+        Ocorrencia ocorrencia = ocorrenciaQry.unique();
+
+        return ocorrencia;
     }
 
     public Ocorrencia addOcorrencia(Long id, String ocorrencia_desc, boolean pendencia, boolean ativo,
@@ -128,6 +146,41 @@ public class Manager {
     public Pessoa findPessoaById(Long id){
         return app.getDaoSession().getPessoaDao().queryBuilder().where(PessoaDao.Properties.Id.eq(id)).unique();
     }
+
+    public List<Pessoa> findPessoasByDataRomaneio(Date data_expedicao, boolean finalizada){
+
+        String data = Util.getDateFormatYMD(data_expedicao);
+
+        QueryBuilder qryPessoas = app.getDaoSession().getPessoaDao().queryBuilder();
+
+
+        Join joinDocumento = qryPessoas.join(Documento.class, DocumentoDao.Properties.DestinatarioCnpj);
+
+        Join joinRomaneio = qryPessoas.join(joinDocumento,DocumentoDao.Properties.RomaneioId,
+                Romaneio.class,RomaneioDao.Properties.Id);
+
+        //qryPessoas.LOG_SQL = false;
+        //qryPessoas.LOG_VALUES = false;
+
+        joinRomaneio.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        if (finalizada){
+            qryPessoas.where( new WhereCondition.StringCondition("cnpj_cpf IN " +
+                    "(SELECT destinatario_cnpj FROM documento WHERE id_ocorrencia > 0 AND (id_ocorrencia < 300 OR id_ocorrencia > 399))"));
+        } else {
+            qryPessoas.where( new WhereCondition.StringCondition("cnpj_cpf IN " +
+                    "(SELECT destinatario_cnpj FROM documento WHERE id_ocorrencia = 0 OR (id_ocorrencia >= 300 OR id_ocorrencia <= 399))"));
+        }
+
+        List<Pessoa> pessoas = qryPessoas.list();
+//       List<Documento> documentos = query.orderRaw("cep ASC").list();
+
+        //qryPessoas.LOG_SQL = false;
+        //qryPessoas.LOG_VALUES = false;
+
+        return pessoas;
+    }
+
 
     public List<Pessoa> findPessoasByDataRomaneio(Date data_expedicao){
 
@@ -403,11 +456,11 @@ public class Manager {
             }
 
 
-            if (app.getModoConsulta()){
-                documento.setIdOcorrencia(idOcorrencia);
-                documento.setDataOcorrencia(dataOcorrencia);
-                app.getDaoSession().update(documento);
-            }
+            //if (app.getModoConsulta()){
+            //    documento.setIdOcorrencia(idOcorrencia);
+            //    documento.setDataOcorrencia(dataOcorrencia);
+            //    app.getDaoSession().update(documento);
+            //}
 
             //Se documento foi incluido num romaneio mais recente, apaga documento atual
             // e inclui um novo

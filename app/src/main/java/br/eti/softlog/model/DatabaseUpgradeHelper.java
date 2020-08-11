@@ -22,6 +22,7 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
 
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
+
         List<Migration> migrations = getMigrations();
 
         // Only run migrations past the old version
@@ -41,6 +42,7 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         migrations.add(new MigrationV13());
         migrations.add(new MigrationV14());
         migrations.add(new MigrationV17());
+        migrations.add(new MigrationV18());
 
 
         // Sorting just to be safe, in case other people add migrations in the wrong order.
@@ -208,6 +210,21 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         public void runMigration(Database db) {
             //Adding new table
             db.execSQL("ALTER TABLE " + DocumentoDao.TABLENAME + " ADD COLUMN " +  DocumentoDao.Properties.Cep.columnName + " TEXT");
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
+    private static class MigrationV18 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 18;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            db.execSQL("ALTER TABLE " + OcorrenciaDocumentoDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDocumentoDao.Properties.IdServidor.columnName + " INTEGER");
             //UsuarioDao.createTable(db, false);
         }
     }

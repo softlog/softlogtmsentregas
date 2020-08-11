@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
@@ -36,14 +39,14 @@ import static com.blankj.utilcode.util.ActivityUtils.startActivity;
  * Created by Paulo Sérgio Alves on 2018/03/21.
  */
 
-public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntregas.ViewHolder>  {
+public class DataAdapterEntregas2 extends RecyclerView.Adapter<DataAdapterEntregas2.ViewHolder>  {
 
     private RecyclerViewClickListener mListener;
 
     private final List<Documento> documentos;
     private EntregasApp app;
 
-    public DataAdapterEntregas(Context context, List<Documento> documentos,  EntregasApp app,
+    public DataAdapterEntregas2(Context context, List<Documento> documentos,  EntregasApp app,
                                RecyclerViewClickListener listener) {
         this.documentos = documentos;
         this.app = app;
@@ -52,11 +55,11 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
 
     @NonNull
     @Override
-    public DataAdapterEntregas.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public DataAdapterEntregas2.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.list_view_entregas , viewGroup, false);
+                .inflate(R.layout.list_view_entregas2 , viewGroup, false);
 
-        return new DataAdapterEntregas.ViewHolder(view, mListener);
+        return new DataAdapterEntregas2.ViewHolder(view, mListener);
 
 
     }
@@ -93,7 +96,7 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
         String cep = doc.getDestinatario().getCep();
 
         viewHolder.txtRomaneio.setText("Romaneio: " + doc.getRomaneio().getNumeroRomaneio()
-                        + " - " +
+                + " - " +
                 Util.getDateFormatDMY(doc.getRomaneio().getDataSaida().substring(0,10)));
 
         try{
@@ -103,7 +106,6 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
             viewHolder.txtOcorrencia.setText("OCORRENCIA NAO ENCONTRADA");
 
         }
-
 
         cep = cep.substring(0,5) + "-" + cep.substring(5,8);
 
@@ -153,6 +155,13 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
         } catch (Exception e) {
 
         }
+
+        viewHolder.btnEntregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Adapter","Olá");
+            }
+        });
     }
 
     @Override
@@ -184,6 +193,7 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
         EditText editTemp;
         TextView txtRomaneio;
         TextView txtOcorrencia;
+        ImageButton btnEntregar;
 
         public ViewHolder(View view, RecyclerViewClickListener listener) {
             super(view);
@@ -205,6 +215,9 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
             txtRomaneio = view.findViewById(R.id.txt_romaneio);
             txtOcorrencia = view.findViewById(R.id.txt_ocorrencia);
             editTemp = new EditText(view.getContext());
+            btnEntregar = view.findViewById(R.id.btn_entrega);
+
+
 
         }
 

@@ -227,7 +227,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     error.getMessage(),
                                                     Toast.LENGTH_LONG).show();
 
-                                            Util.appendLog("Login",error.getMessage(),myapp.getFileLog());
+                                            //Util.appendLog("Login",error.getMessage(),myapp.getFileLog());
 
                                         } else {
                                             if (error.networkResponse.statusCode == 404) {
@@ -242,7 +242,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         R.string.erro_acesso,
                                                         Toast.LENGTH_LONG).show();
 
-                                                Util.appendLog("Login",error.getMessage(),myapp.getFileLog());
+                                                //Util.appendLog("Login",error.getMessage(),myapp.getFileLog());
 
                                             }
                                         }

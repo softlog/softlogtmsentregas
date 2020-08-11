@@ -116,14 +116,17 @@ public final class Util {
     public static void appendLog(String text, String pathFile)
     {
 
-
-
+        if (text == null)
+            return ;
         if (!Prefs.getBoolean("modo_debug",false)){
             return ;
         }
-
-
-        File logFile = new File(pathFile);
+        File logFile;
+        try{
+            logFile = new File(pathFile);
+        } catch (Error e){
+            return ;
+        }
 
         if (!logFile.exists())
         {
@@ -154,11 +157,18 @@ public final class Util {
     public static void appendLog(String tag, String text, String pathFile)
     {
 
+        if (text == null)
+            return ;
         if (!Prefs.getBoolean("modo_debug",false)){
             return ;
         }
+        File logFile;
+        try{
+            logFile = new File(pathFile);
+        } catch (Error e){
+            return ;
+        }
 
-        File logFile = new File(pathFile);
 
         if (!logFile.exists())
         {

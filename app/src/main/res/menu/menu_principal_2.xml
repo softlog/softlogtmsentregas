@@ -1,10 +1,67 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.administrador.apptabview.Main4Activity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/data_corrente"
+        android:icon="@drawable/ic_action_calendar"
+        android:title="@string/data_protocolo"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/scanner"
+        android:icon="@drawable/ic_action_barcode"
+        android:title="@string/scanner"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/localizar"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="collapseActionView|always" />
+
+    <item
+        android:id="@+id/atualizar"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/refresh"
         app:showAsAction="never" />
+
+    <item android:id="@+id/sincronizar"
+        android:title="Sincronizar dados"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/reenvio_imagens"
+        android:title="Reenviar todas imagens"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/reenvio_ocorrencia"
+        android:title="Reenviar Ocorrências do Dia"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_mapa"
+        android:icon="@drawable/ic_map"
+        android:title="Google Maps"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/send_log"
+        android:title="Compartilhar Log"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/send_db"
+        android:title="Compartilhar Banco de Dados"
+        app:showAsAction="never" />
+
+
+    <item android:id="@+id/config"
+        android:title="@string/config"
+        app:showAsAction="never" />
+
+
+    <item android:id="@+id/exit"
+        android:title="@string/exit"
+        app:showAsAction="never" />
+
 </menu>

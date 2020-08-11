@@ -3,6 +3,8 @@ package br.eti.softlog.softlogtmsentregas;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,8 +45,12 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.JsonObject;
 
 import com.koushikdutta.async.future.FutureCallback;
@@ -94,6 +100,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 public class MainActivity extends AppCompatActivity implements OnLocationUpdatedListener {
 
+
     EntregasApp myapp;
     RecyclerView lista_entregas;
     Manager manager;
@@ -107,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     private FusedLocationProviderClient mFusedLocationClient;
 
     // Inicializar o provedor de credenciais do Amazon Cognito
-    CognitoCachingCredentialsProvider credentialsProvider;
 
     DataAdapterEntregas adapter;
     List<Documento> documentos;
@@ -133,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         context = this.getApplicationContext();
 
         myapp = (EntregasApp) getApplicationContext();
@@ -140,11 +147,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
         util = new Util();
 
         Intent inCall = getIntent();
-
-        chaveNfe = inCall.getStringExtra("chave_nfe");
-        if (chaveNfe == null){
-            chaveNfe = "";
-        }
 
         getSupportActionBar().setTitle("Lista Entregas");
 
@@ -267,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         txtUsuario = findViewById(R.id.txtUsuario);
         txtUsuario.setText(myapp.getUsuario().getNome().toString());
+
         //loadOcorrencias();
         this.dataSync(data_corrente);
 
@@ -307,6 +310,8 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
     }
 
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_principal, menu);
@@ -325,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
                 try {
 
-                    chaveNfe = "";
+
                     String data = Util.getDateFormatYMD(myapp.getDate());
 
                     QueryBuilder queryBuilder = myapp.getDaoSession().getDocumentoDao().queryBuilder()
@@ -387,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         } else if (id == R.id.atualizar) {
 
-            chaveNfe = "";
+
             //documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
             reloadAllData();
             //loadOcorrencias();
@@ -395,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         } else if (id == R.id.sincronizar) {
             loadOcorrencias();
-            chaveNfe = "";
+
             this.dataSync(myapp.getDate());
             dataSync2.sendOcorrencias();
             dataSync2.sendImagens();
@@ -410,6 +415,17 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     }
                 }
             }
+        } else if (id == R.id.reenvio_ocorrencia) {
+            for (Documento documento:documentos){
+                for (OcorrenciaDocumento oco:documento.getOcorrenciaDocumentos()){
+                    oco.setSincronizado(false);
+                    myapp.getDaoSession().update(oco);
+                }
+            }
+
+            dataSync2.sendOcorrencias();
+            dataSync2.sendImagens();
+
         } else if (id == R.id.send_log) {
 
 
@@ -441,10 +457,9 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
             String dirBackup = Environment.getExternalStorageDirectory() + "/sconfirmei";
             File fileDb = new File(dirBackup, nameDb);
-            Uri contentUri = Uri.fromFile(fileDb);
 
-
-
+            Uri contentUri = PublicFileProvider.getUriForFile(getApplicationContext(),
+                    "com.mydomain.publicfileprovider", fileDb);
             ///mnt/sdcard/sconfirmei/05137082864_114._log_sconfirmei.txt
             final Intent shareIntent = new Intent(Intent.ACTION_SEND);
 
@@ -488,9 +503,11 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
 
         reloadAllData();
 
+        /*
         if (!connectivity.isConnected(getApplicationContext())) {
             return;
         }
+         */
 
         boolean r = myapp.getConfigDownloadMobile();
 
@@ -535,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                     String dataExtenso = getDateFormat(data_corrente);
                     txtDate.setText(dataExtenso);
 
-                    chaveNfe = "";
+
                     myapp.setDate(data_corrente);
 
                     entregas = manager.findPessoasByDataRomaneio(myapp.getDate());
@@ -697,7 +714,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                                 //Log.d("Posicao", String.valueOf(i));
                                 Documento doc = documentos.get(i);
                                 if (doc.getDestinatario().getLongitude() == null) {
-
                                     if (i == ultimo) {
 
                                     }
@@ -832,9 +848,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             /*
             String url = "http://api.softlog.eti.br/api/softlog/romaneio2/" + codigo_acesso +
                     "/" + cData + "/" + cpf;
-
              */
-
 
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
@@ -848,6 +862,7 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
                 @Override
                 public void onErrorResponse(VolleyError error) {
 
+                    //util.appendLog("Download de Documentos", error.getMessage(), myapp.getFileLog());
                     //Log.d("ERRO",error.toString());
                     if (error.networkResponse != null) {
                         reloadAllData();
@@ -856,7 +871,6 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             });
 
             AppSingleton.getInstance(myapp.getApplicationContext()).addToRequestQueue(stringRequest, "Romaneios");
-
 
             return null;
         }

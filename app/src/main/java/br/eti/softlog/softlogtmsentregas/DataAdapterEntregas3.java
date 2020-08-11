@@ -1,62 +1,45 @@
 package br.eti.softlog.softlogtmsentregas;
 
-import android.app.Activity;
+
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.text.DecimalFormat;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import br.eti.softlog.adapters.DataAdapterImagemOcorrencia;
-import br.eti.softlog.model.Documento;
-import br.eti.softlog.model.ImagemOcorrencia;
-import br.eti.softlog.utils.MaskEditUtil;
+import br.eti.softlog.model.Pessoa;
 import br.eti.softlog.utils.RecyclerViewClickListener;
-import br.eti.softlog.utils.Util;
 
-import static com.blankj.utilcode.util.ActivityUtils.startActivity;
-
-/**
- * Created by Paulo Sérgio Alves on 2018/03/21.
- */
-
-public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntregas.ViewHolder>  {
+public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntregas3.ViewHolder>  {
 
     private RecyclerViewClickListener mListener;
 
-    private final List<Documento> documentos;
+    private final List<Pessoa> entregas;
     private EntregasApp app;
 
-    public DataAdapterEntregas(Context context, List<Documento> documentos,  EntregasApp app,
-                               RecyclerViewClickListener listener) {
-        this.documentos = documentos;
+    public DataAdapterEntregas3(Context context, List<Pessoa> entregas, EntregasApp app,
+                                RecyclerViewClickListener listener) {
+
+        this.entregas = entregas;
         this.app = app;
         mListener = listener;
+
     }
 
     @NonNull
     @Override
-    public DataAdapterEntregas.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public DataAdapterEntregas3.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.list_view_entregas , viewGroup, false);
+                .inflate(R.layout.list_view_entregas_3 , viewGroup, false);
 
-        return new DataAdapterEntregas.ViewHolder(view, mListener);
+        return new DataAdapterEntregas3.ViewHolder(view, mListener);
 
 
     }
@@ -71,31 +54,23 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
 
         viewHolder.editTemp.setVisibility(View.INVISIBLE);
 
-        Documento doc = documentos.get(i);
+        Pessoa entrega = entregas.get(i);
 
         String numeroNfe;
 
-        numeroNfe = "NFe: " + doc.getNumeroNotaFiscal().toString() + "-" +
-                doc.getSerie().toString();
 //        numeroNfe = "NFe: " + doc.getNumeroNotaFiscal().toString().
 //                replaceFirst("^0+(?!$)", "") + "-" +
 //                doc.getSerie().toString().replaceFirst("^0+(?!$)", "");
 
-        viewHolder.txtNumero.setText(numeroNfe);
-        viewHolder.txtNumero.setBackgroundColor(Color.LTGRAY);
 
-        viewHolder.txtRemetente.setText(doc.getRemetente().getNome());
-        viewHolder.txtDestinatario.setText(doc.getDestinatario().getNome().trim());
-        viewHolder.txtTelefone.setText(doc.getDestinatario().getTelefone());
-        viewHolder.txtEndereco.setText(doc.getDestinatario().getEndereco() + " " +
-                doc.getDestinatario().getNumero());
-        viewHolder.txtBairro.setText(doc.getDestinatario().getBairro().trim());
-        String cep = doc.getDestinatario().getCep();
+        viewHolder.txtDestinatario.setText(entrega.getNome().trim());
+        viewHolder.txtTelefone.setText(entrega.getTelefone());
+        viewHolder.txtEndereco.setText(entrega.getEndereco() + " " +
+                entrega.getNumero());
+        viewHolder.txtBairro.setText(entrega.getBairro().trim());
+        String cep = entrega.getCep();
 
-        viewHolder.txtRomaneio.setText("Romaneio: " + doc.getRomaneio().getNumeroRomaneio()
-                        + " - " +
-                Util.getDateFormatDMY(doc.getRomaneio().getDataSaida().substring(0,10)));
-
+        /*
         try{
             viewHolder.txtOcorrencia.setText(doc.getOcorrencia().getId().toString() + " - " +
                     doc.getOcorrencia().getOcorrencia());
@@ -104,16 +79,18 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
 
         }
 
+         */
 
         cep = cep.substring(0,5) + "-" + cep.substring(5,8);
 
         viewHolder.txtCep.setText(cep);
-        viewHolder.txtCidade.setText(doc.getDestinatario().getCidade().getNomeCidade().trim() + "-" +
-                doc.getDestinatario().getCidade().getUf().trim());
+        viewHolder.txtCidade.setText(entrega.getCidade().getNomeCidade().trim() + "-" +
+                entrega.getCidade().getUf().trim());
 
         String sDistancia;
         String sDuracao;
 
+        /*
         if (doc.getDistance() == null) {
             sDistancia = "N/D";
         } else {
@@ -121,6 +98,7 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
             double distancia = doc.getDistance()/1000;
             sDistancia = df.format(distancia);
         }
+
 
         viewHolder.txtDistancia.setText(sDistancia);
 
@@ -134,8 +112,8 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
 
             sDuracao = String.format("%02d:%02d:%02d", hours, minutes, seconds);
         }
-
         viewHolder.txtDuracao.setText(sDuracao);
+
 
 
         try {
@@ -153,15 +131,23 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
         } catch (Exception e) {
 
         }
+         */
+
+        viewHolder.btnEntregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Adapter","Olá");
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return documentos.size();
+        return entregas.size();
     }
 
-    public List<Documento> getData() {
-        return documentos;
+    public List<Pessoa> getData() {
+        return entregas;
     }
 
 
@@ -170,7 +156,7 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
 
         private RecyclerViewClickListener clickListener;
 
-        TextView txtNumero;
+
         TextView txtDestinatario;
         TextView txtTelefone;
         TextView txtEndereco;
@@ -184,6 +170,7 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
         EditText editTemp;
         TextView txtRomaneio;
         TextView txtOcorrencia;
+        ImageButton btnEntregar;
 
         public ViewHolder(View view, RecyclerViewClickListener listener) {
             super(view);
@@ -191,7 +178,6 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
             clickListener = listener;
             view.setOnClickListener(this);
 
-            txtNumero = view.findViewById(R.id.entregaNumero);
             txtDestinatario = view.findViewById(R.id.entregaDestinatario);
             txtTelefone = view.findViewById(R.id.entregaTelefone);
             txtEndereco = view.findViewById(R.id.entregaEndereco);
@@ -202,9 +188,8 @@ public class DataAdapterEntregas extends RecyclerView.Adapter<DataAdapterEntrega
             txtDistancia = view.findViewById(R.id.txtKm);
             txtDuracao = view.findViewById(R.id.txtDuracao);
             txtRemetente = view.findViewById(R.id.txtEmitente);
-            txtRomaneio = view.findViewById(R.id.txt_romaneio);
-            txtOcorrencia = view.findViewById(R.id.txt_ocorrencia);
             editTemp = new EditText(view.getContext());
+            btnEntregar = view.findViewById(R.id.btn_entrega);
 
         }
 

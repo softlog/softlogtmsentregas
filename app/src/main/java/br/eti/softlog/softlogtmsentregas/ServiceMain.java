@@ -1,10 +1,15 @@
 package br.eti.softlog.softlogtmsentregas;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -14,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 public class ServiceMain extends Service {
 
@@ -36,6 +44,7 @@ public class ServiceMain extends Service {
         myapp = (EntregasApp) getApplicationContext();
         d = new DataSync(myapp.getApplicationContext());
         startId = -1;
+
         //this.startservice();
     }
 
@@ -51,9 +60,37 @@ public class ServiceMain extends Service {
             Worker worker = new Worker(startId);
             worker.start();
             threads.add(worker);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startMyOwnForeground();
+            else
+                startForeground(1, new Notification());
+
         }
 
         return(super.onStartCommand(intent,flags,startId));
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void startMyOwnForeground(){
+        String NOTIFICATION_CHANNEL_ID = "softlog.eti.br";
+        String channelName = "SConfirmei";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.ic_softlog)
+                .setContentTitle("sConfirmei está em execução")
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+        startForeground(2, notification);
     }
 
     @Override

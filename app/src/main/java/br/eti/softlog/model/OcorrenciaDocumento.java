@@ -72,6 +72,9 @@ public class OcorrenciaDocumento {
     @Property(nameInDb = "tarefa_executada_id")
     private Long tarefaExecutadaId;
 
+    @Property(nameInDb = "id_servidor")
+    private Long idServidor;
+
     @ToOne(joinProperty = "tarefaExecutadaId")
     private TarefasExecutadas tarefaExecutada;
 
@@ -86,12 +89,12 @@ private transient DaoSession daoSession;
 @Generated(hash = 1805366801)
 private transient OcorrenciaDocumentoDao myDao;
 
-@Generated(hash = 1390457423)
+@Generated(hash = 1318772727)
 public OcorrenciaDocumento(Long id, Long documentoId, Long codigoOcorrencia,
         String dataOcorrencia, String horaOcorrencia, String dataRegistro,
         String documentoRecebedor, String nomeRecebedor, String observacoes,
         String latitude, String longitude, boolean sincronizado, String dataSincronizacao,
-        Long tarefaExecutadaId) {
+        Long tarefaExecutadaId, Long idServidor) {
     this.id = id;
     this.documentoId = documentoId;
     this.codigoOcorrencia = codigoOcorrencia;
@@ -106,6 +109,7 @@ public OcorrenciaDocumento(Long id, Long documentoId, Long codigoOcorrencia,
     this.sincronizado = sincronizado;
     this.dataSincronizacao = dataSincronizacao;
     this.tarefaExecutadaId = tarefaExecutadaId;
+    this.idServidor = idServidor;
 }
 
 @Generated(hash = 1712609508)
@@ -386,6 +390,14 @@ public void setTarefaExecutada(TarefasExecutadas tarefaExecutada) {
         tarefaExecutadaId = tarefaExecutada == null ? null : tarefaExecutada.getId();
         tarefaExecutada__resolvedKey = tarefaExecutadaId;
     }
+}
+
+public Long getIdServidor() {
+    return this.idServidor;
+}
+
+public void setIdServidor(Long idServidor) {
+    this.idServidor = idServidor;
 }
 
 /** called by internal mechanisms, do not call yourself. */

@@ -25,14 +25,22 @@ public class ExtractRomaneioJson {
         manager = new Manager(app);
     }
 
-    public void extract(String response){
+    public void extract(String response) {
+        JSONObject jObj = null;
+        try {
+            jObj = new JSONObject(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        extract(jObj);
+    }
 
+    public void extract(JSONObject jObj){
 
         try {
             //Log.d("Response",response);
             //Log.d("Extraindo Dados","Romaneios");
-            JSONObject jObj = new JSONObject(response);
-
             //Gravando Cidades
             JSONArray cidades = jObj.getJSONArray("cidades");
 

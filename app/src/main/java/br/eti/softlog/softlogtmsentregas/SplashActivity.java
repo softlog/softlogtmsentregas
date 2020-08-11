@@ -40,13 +40,14 @@ public class SplashActivity extends AppCompatActivity {
                     }
                 }
                 if (myapp.getStatus()) {
+                    //Intent i = new Intent(SplashActivity.this,MainActivity.class );
+                    //Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent i = new Intent(SplashActivity.this, PrincipalDraweActivity.class);
 
-                    Intent i = new Intent(SplashActivity.this,MainActivity.class );
-                    //Intent i = new Intent(SplashActivity.this,PrincipalActivity.class );
                     //Intent i = new Intent(SplashActivity.this,MainActivityFreeTrackGps.class );
                     startActivity(i);
                 } else {
-                    Intent i = new Intent(SplashActivity.this,LoginActivity.class );
+                    Intent i = new Intent(SplashActivity.this,LoginActivity.class);
                     startActivity(i);
                 }
                 // Fecha esta activity

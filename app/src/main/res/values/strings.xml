@@ -152,7 +152,6 @@
 
     <string name="gpsPositionLabel">Position GPS</string>
 
-
     <string name="workoutStatusLabel">Workout status</string>
     <string name="workoutDistanceLabel">Distance</string>
     <string name="workoutStartLabel">Start</string>
@@ -280,4 +279,7 @@
         <item>0.95</item>
     </string-array>
 
+    <string name="open">Abrir</string>
+    <string name="close">Fechar</string>
+    <string name="default_notification_channel_id">1</string>
 </resources>
