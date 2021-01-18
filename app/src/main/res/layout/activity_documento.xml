@@ -406,7 +406,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txtOcorrencia" />
 
     <TextView
-        android:id="@+id/txt_romaneio"
+        android:id="@+id/txt_notas_fiscais"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -438,7 +438,7 @@
         android:layout_marginStart="8dp"
         android:text="TextView"
         app:layout_constraintStart_toEndOf="@+id/textView21"
-        app:layout_constraintTop_toBottomOf="@+id/txt_romaneio" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

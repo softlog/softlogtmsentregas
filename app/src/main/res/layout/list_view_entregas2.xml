@@ -216,7 +216,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
 
             <TextView
-                android:id="@+id/txt_romaneio"
+                android:id="@+id/txt_notas_fiscais"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -242,7 +242,7 @@
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/entregaBairro"
-                app:layout_constraintTop_toBottomOf="@+id/txt_romaneio" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
 
             <ImageButton
                 android:id="@+id/btn_entrega"

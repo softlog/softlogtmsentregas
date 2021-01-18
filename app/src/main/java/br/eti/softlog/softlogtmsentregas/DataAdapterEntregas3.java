@@ -2,6 +2,8 @@ package br.eti.softlog.softlogtmsentregas;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,22 +16,29 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import br.eti.softlog.model.Documento;
+import br.eti.softlog.model.Entregas;
 import br.eti.softlog.model.Pessoa;
 import br.eti.softlog.utils.RecyclerViewClickListener;
+
+import static androidx.core.content.ContextCompat.startActivity;
 
 public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntregas3.ViewHolder>  {
 
     private RecyclerViewClickListener mListener;
-
-    private final List<Pessoa> entregas;
+    private Manager manager;
+    private final List<Entregas> entregas;
     private EntregasApp app;
+    Context context;
 
-    public DataAdapterEntregas3(Context context, List<Pessoa> entregas, EntregasApp app,
+    public DataAdapterEntregas3(Context context, List<Entregas> entregas, EntregasApp app,
                                 RecyclerViewClickListener listener) {
 
         this.entregas = entregas;
         this.app = app;
+        this.manager = new Manager(this.app);
         mListener = listener;
+        this.context = context;
 
     }
 
@@ -54,7 +63,7 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
 
         viewHolder.editTemp.setVisibility(View.INVISIBLE);
 
-        Pessoa entrega = entregas.get(i);
+        Entregas entrega = entregas.get(i);
 
         String numeroNfe;
 
@@ -63,12 +72,17 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
 //                doc.getSerie().toString().replaceFirst("^0+(?!$)", "");
 
 
-        viewHolder.txtDestinatario.setText(entrega.getNome().trim());
-        viewHolder.txtTelefone.setText(entrega.getTelefone());
-        viewHolder.txtEndereco.setText(entrega.getEndereco() + " " +
-                entrega.getNumero());
-        viewHolder.txtBairro.setText(entrega.getBairro().trim());
-        String cep = entrega.getCep();
+        viewHolder.txtDestinatario.setText(entrega.getDestinatario().getNome().trim());
+        if (entrega.getDestinatario().getTelefone() == null){
+            viewHolder.txtTelefone.setText("Telefone não informado.");
+        } else {
+            viewHolder.txtTelefone.setText("Fone: " + entrega.getDestinatario().getTelefone());
+        }
+
+        viewHolder.txtEndereco.setText(entrega.getDestinatario().getEndereco() + " " +
+                entrega.getDestinatario().getNumero());
+        viewHolder.txtBairro.setText(entrega.getDestinatario().getBairro().trim());
+        String cep = entrega.getDestinatario().getCep();
 
         /*
         try{
@@ -76,16 +90,27 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
                     doc.getOcorrencia().getOcorrencia());
         } catch (Exception e){
             viewHolder.txtOcorrencia.setText("OCORRENCIA NAO ENCONTRADA");
-
         }
-
          */
 
         cep = cep.substring(0,5) + "-" + cep.substring(5,8);
 
         viewHolder.txtCep.setText(cep);
-        viewHolder.txtCidade.setText(entrega.getCidade().getNomeCidade().trim() + "-" +
-                entrega.getCidade().getUf().trim());
+        viewHolder.txtCidade.setText(entrega.getDestinatario().getCidade().getNomeCidade().trim() + "-" +
+                entrega.getDestinatario().getCidade().getUf().trim());
+
+
+        //List<Documento> documentos = manager.findDocumentosByRomaneioDestinatario(app.getDate(),entrega.getDestinatario().getCnpjCpf());
+        String listaNotasFiscais;
+        listaNotasFiscais = "";
+        for (Documento documento:entrega.getDocumentos()){
+            listaNotasFiscais = listaNotasFiscais + documento.getNumeroNotaFiscal() + " ";
+        }
+        //listaNotasFiscais = listaNotasFiscais + ",";
+        //listaNotasFiscais.replace(", ,","");
+
+        viewHolder.txtQtdNotas.setText(String.valueOf(entrega.getDocumentos().size()));
+        viewHolder.txtNotasFiscais.setText(listaNotasFiscais);
 
         String sDistancia;
         String sDuracao;
@@ -98,7 +123,6 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
             double distancia = doc.getDistance()/1000;
             sDistancia = df.format(distancia);
         }
-
 
         viewHolder.txtDistancia.setText(sDistancia);
 
@@ -136,7 +160,10 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
         viewHolder.btnEntregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Adapter","Olá");
+                Intent intent = new Intent(context, OcorrenciaStepActivity.class);
+                intent.putExtra("destinatario_cnpj",entrega.getDestinatario().getCnpjCpf());
+                intent.putExtra("id_ocorrencia_padrao", Long.valueOf(1));
+                context.startActivity(intent);
             }
         });
     }
@@ -146,7 +173,7 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
         return entregas.size();
     }
 
-    public List<Pessoa> getData() {
+    public List<Entregas> getData() {
         return entregas;
     }
 
@@ -168,9 +195,11 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
         TextView txtDuracao;
         TextView txtRemetente;
         EditText editTemp;
-        TextView txtRomaneio;
+        TextView txtNotasFiscais;
         TextView txtOcorrencia;
+        TextView txtQtdNotas;
         ImageButton btnEntregar;
+
 
         public ViewHolder(View view, RecyclerViewClickListener listener) {
             super(view);
@@ -184,12 +213,14 @@ public class DataAdapterEntregas3 extends RecyclerView.Adapter<DataAdapterEntreg
             txtBairro = view.findViewById(R.id.entregaBairro);
             txtCep = view.findViewById(R.id.entregaCep);
             txtCidade = view.findViewById(R.id.entregaCidade);
-            txtColor = view.findViewById(R.id.txtColor);
             txtDistancia = view.findViewById(R.id.txtKm);
             txtDuracao = view.findViewById(R.id.txtDuracao);
             txtRemetente = view.findViewById(R.id.txtEmitente);
+            txtNotasFiscais = view.findViewById(R.id.txt_notas_fiscais);
+            txtQtdNotas = view.findViewById(R.id.txt_qtd_notas);
             editTemp = new EditText(view.getContext());
             btnEntregar = view.findViewById(R.id.btn_entrega);
+
 
         }
 

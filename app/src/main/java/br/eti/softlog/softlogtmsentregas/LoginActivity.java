@@ -71,6 +71,9 @@ public class LoginActivity extends AppCompatActivity {
 
         crashlytics = FirebaseCrashlytics.getInstance();
 
+
+
+
         try {
             String versionName = getPackageManager()
                     .getPackageInfo(getPackageName(), 0).versionName;
@@ -193,8 +196,12 @@ public class LoginActivity extends AppCompatActivity {
                                         myapp.setConfigDb(nome_bd);
                                         myapp.setConfigStatus(true);
 
+                                        /*
                                         Intent intent = new Intent(LoginActivity.this,
                                                 MainActivity.class);
+                                         */
+                                        Intent intent = new Intent(LoginActivity.this,
+                                                PrincipalDraweActivity.class);
 
                                         startActivity(intent);
 

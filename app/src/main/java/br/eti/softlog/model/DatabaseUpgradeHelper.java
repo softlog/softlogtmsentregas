@@ -43,7 +43,13 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
         migrations.add(new MigrationV14());
         migrations.add(new MigrationV17());
         migrations.add(new MigrationV18());
-
+        migrations.add(new MigrationV20());
+        migrations.add(new MigrationV25());
+        migrations.add(new MigrationV26());
+        migrations.add(new MigrationV27());
+        migrations.add(new MigrationV28());
+        migrations.add(new MigrationV29());
+        migrations.add(new MigrationV31());
 
         // Sorting just to be safe, in case other people add migrations in the wrong order.
 //        Comparator<Migration> migrationComparator = new Comparator<Migration>() {
@@ -226,6 +232,155 @@ public class DatabaseUpgradeHelper extends DaoMaster.OpenHelper {
             //Adding new table
             db.execSQL("ALTER TABLE " + OcorrenciaDocumentoDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDocumentoDao.Properties.IdServidor.columnName + " INTEGER");
             //UsuarioDao.createTable(db, false);
+        }
+    }
+
+    private static class MigrationV20 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 20;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            db.execSQL("ALTER TABLE " + DocumentoDao.TABLENAME + " ADD COLUMN " +  DocumentoDao.Properties.Selected.columnName + " INTEGER");
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
+    private static class MigrationV25 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 25;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + DocumentoDao.TABLENAME + " ADD COLUMN " +  DocumentoDao.Properties.EntregaId.columnName + " INTEGER");
+            } catch (Exception e){
+
+            }
+
+            try{
+                db.execSQL("CREATE TABLE entregas (" +
+                        EntregasDao.Properties.Id.columnName + " INTEGER, " +
+                        EntregasDao.Properties.DestinatarioId.columnName + " TEXT, " +
+                        EntregasDao.Properties.DataExpedicao.columnName + " TEXT, " +
+                        EntregasDao.Properties.Status.columnName + " TEXT, " +
+                        EntregasDao.Properties.Latitude.columnName + " TEXT, " +
+                        EntregasDao.Properties.Longitude.columnName + " TEXT, " +
+                        EntregasDao.Properties.OrdemEntrega.columnName + " TEXT, " +
+                        EntregasDao.Properties.TemPendencia + " INTEGER" +
+                        ")");
+            } catch (Exception e){
+
+            }
+            //UsuarioDao.createTable(db, false);
+        }
+    }
+
+    private static class MigrationV26 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 26;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.IdOcorrenciaPadrao.columnName + " INTEGER");
+            } catch (Exception e){
+
+            }
+
+        }
+    }
+
+    private static class MigrationV27 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 27;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.DataOcorrencia.columnName + " TEXT");
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.HoraOcorrencia.columnName + " TEXT");
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.NomeRecebedor.columnName + " TEXT");
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.DocumentoRecebedor.columnName + " TEXT");
+                db.execSQL("ALTER TABLE " + EntregasDao.TABLENAME + " ADD COLUMN " +  EntregasDao.Properties.Observacoes.columnName + " TEXT");
+            } catch (Exception e){
+
+            }
+
+        }
+    }
+
+    private static class MigrationV28 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 28;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + DocumentoDao.TABLENAME + " ADD COLUMN " +  DocumentoDao.Properties.TemCanhoto.columnName + " INTEGER");
+            } catch (Exception e){
+
+            }
+
+        }
+    }
+
+    private static class MigrationV29 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 29;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + OcorrenciaDocumentoDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDocumentoDao.Properties.Finalizado.columnName + " INTEGER");
+                db.execSQL("ALTER TABLE " + OcorrenciaDocumentoDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDocumentoDao.Properties.EntregaId.columnName + " INTEGER");
+            } catch (Exception e){
+
+            }
+
+        }
+    }
+
+    private static class MigrationV31 implements Migration {
+
+        @Override
+        public Integer getVersion() {
+            return 31;
+        }
+
+        @Override
+        public void runMigration(Database db) {
+            //Adding new table
+            try{
+                db.execSQL("ALTER TABLE " + OcorrenciaDocumentoDao.TABLENAME + " ADD COLUMN " +  OcorrenciaDocumentoDao.Properties.TemCanhoto.columnName + " INTEGER");
+            } catch (Exception e){
+
+            }
+
         }
     }
 

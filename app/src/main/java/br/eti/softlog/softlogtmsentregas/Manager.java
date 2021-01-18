@@ -17,6 +17,8 @@ import br.eti.softlog.model.Cidade;
 import br.eti.softlog.model.CidadeDao;
 import br.eti.softlog.model.Documento;
 import br.eti.softlog.model.DocumentoDao;
+import br.eti.softlog.model.Entregas;
+import br.eti.softlog.model.EntregasDao;
 import br.eti.softlog.model.ImagemOcorrencia;
 import br.eti.softlog.model.ImagemOcorrenciaDao;
 import br.eti.softlog.model.Ocorrencia;
@@ -147,29 +149,40 @@ public class Manager {
         return app.getDaoSession().getPessoaDao().queryBuilder().where(PessoaDao.Properties.Id.eq(id)).unique();
     }
 
-    public List<Pessoa> findPessoasByDataRomaneio(Date data_expedicao, boolean finalizada){
+    public List<Pessoa> findPessoasByDataRomaneio(Date data_expedicao, boolean finalizada) {
 
         String data = Util.getDateFormatYMD(data_expedicao);
 
         QueryBuilder qryPessoas = app.getDaoSession().getPessoaDao().queryBuilder();
 
 
+        /*
         Join joinDocumento = qryPessoas.join(Documento.class, DocumentoDao.Properties.DestinatarioCnpj);
 
         Join joinRomaneio = qryPessoas.join(joinDocumento,DocumentoDao.Properties.RomaneioId,
                 Romaneio.class,RomaneioDao.Properties.Id);
-
-        //qryPessoas.LOG_SQL = false;
-        //qryPessoas.LOG_VALUES = false;
-
         joinRomaneio.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+         */
+
+        qryPessoas.LOG_SQL = true;
+        qryPessoas.LOG_VALUES = true;
 
         if (finalizada){
             qryPessoas.where( new WhereCondition.StringCondition("cnpj_cpf IN " +
-                    "(SELECT destinatario_cnpj FROM documento WHERE id_ocorrencia > 0 AND (id_ocorrencia < 300 OR id_ocorrencia > 399))"));
+                    "(SELECT destintario_cnpj " +
+                    "FROM documentos " +
+                    "JOIN romaneios " +
+                    "ON documentos.romaneio_id = romaneios._id " +
+                    "WHERE (id_ocorrencia > 0 AND (id_ocorrencia < 300 OR id_ocorrencia > 399)) " +
+                    "AND romaneios  .data_expedicao = '" + Util.getDateFormatYMD(data_expedicao) + "')"));
         } else {
             qryPessoas.where( new WhereCondition.StringCondition("cnpj_cpf IN " +
-                    "(SELECT destinatario_cnpj FROM documento WHERE id_ocorrencia = 0 OR (id_ocorrencia >= 300 OR id_ocorrencia <= 399))"));
+                    "(SELECT destintario_cnpj " +
+                    "FROM documentos " +
+                    "JOIN romaneios " +
+                    "ON documentos.romaneio_id = romaneios._id " +
+                    "WHERE (id_ocorrencia = 0 OR (id_ocorrencia >= 300 OR id_ocorrencia <= 399)) " +
+                    "AND romaneios.data_expedicao = '" + Util.getDateFormatYMD(data_expedicao) + "')"));
         }
 
         List<Pessoa> pessoas = qryPessoas.list();
@@ -181,6 +194,58 @@ public class Manager {
         return pessoas;
     }
 
+    public List<Documento> findDocumentosByRomaneioDestinatario(Date data_expedicao, String destinatarioCnpj){
+
+        String data = Util.getDateFormatYMD(data_expedicao);
+        QueryBuilder query = app.getDaoSession().getDocumentoDao().queryBuilder();
+        query.where(DocumentoDao.Properties.DestinatarioCnpj.eq(destinatarioCnpj));
+
+//      query.LOG_SQL = true;
+//      query.LOG_VALUES = true;
+
+        query.join(DocumentoDao.Properties.RomaneioId,Romaneio.class).
+                where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        //Join pessoas = query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+
+//        query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
+//        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        List<Documento> documentos;
+        documentos = query.orderAsc(DocumentoDao.Properties.NumeroNotaFiscal).list();
+//       List<Documento> documentos = query.orderRaw("cep ASC").list();
+
+        return documentos;
+
+
+    }
+
+    public List<Documento> findDocumentosByRomaneioDestinatarioPendente(Date data_expedicao, String destinatarioCnpj){
+
+        String data = Util.getDateFormatYMD(data_expedicao);
+        QueryBuilder query = app.getDaoSession().getDocumentoDao().queryBuilder();
+        query.where(DocumentoDao.Properties.DestinatarioCnpj.eq(destinatarioCnpj));
+
+//      query.LOG_SQL = true;
+//      query.LOG_VALUES = true;
+
+        query.join(DocumentoDao.Properties.RomaneioId,Romaneio.class).
+                where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        //Join pessoas = query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+
+//        query.join(DocumentoDao.Properties.DestinatarioCnpj,Pessoa.class);
+//        Join joinRomaneios = query.join(DocumentoDao.Properties.RomaneioId, Romaneio.class);
+//        joinRomaneios.where(RomaneioDao.Properties.DataExpedicao.eq(data));
+
+        List<Documento> documentos;
+        documentos = query.orderAsc(DocumentoDao.Properties.NumeroNotaFiscal).list();
+//       List<Documento> documentos = query.orderRaw("cep ASC").list();
+        return documentos;
+
+
+    }
 
     public List<Pessoa> findPessoasByDataRomaneio(Date data_expedicao){
 
@@ -243,10 +308,9 @@ public class Manager {
 
             app.getDaoSession().insert(pessoa);
 
-
         } else {
 
-            if (!pessoa.getEndereco().equals(endereco)){
+            if (!pessoa.getEndereco().equals(endereco)) {
                 Log.d("Add Pessoa","Atualizando endereco");
                 pessoa.setEndereco(endereco);
                 pessoa.setBairro(bairro);
@@ -259,7 +323,7 @@ public class Manager {
                 pessoa.setTelefone(telefone);
                 pessoa.setWhatsapp(whatsapp);
                 app.getDaoSession().update(pessoa);
-            } else if (pessoa.getLatitude() != latitude){
+            } else if (pessoa.getLatitude() != latitude) {
                 pessoa.setLatitude(latitude);
                 pessoa.setLongitude(longitude);
                 app.getDaoSession().update(pessoa);
@@ -291,6 +355,62 @@ public class Manager {
 
         return app.getDaoSession().getRomaneioDao().queryBuilder().
                 where(RomaneioDao.Properties.Id.eq(id)).unique();
+    }
+
+    public List<Entregas> findEntregasByDataStatus(Date dataExpedicao, boolean status){
+
+        String data = Util.getDateFormatYMD(dataExpedicao);
+
+        QueryBuilder<Entregas> qryEntregas = app.getDaoSession().getEntregasDao().queryBuilder()
+                .where(EntregasDao.Properties.DataExpedicao.eq(data))
+                .where(EntregasDao.Properties.Status.eq(status));
+
+        //qryEntregas.LOG_SQL = true;
+        //qryEntregas.LOG_VALUES = true;
+
+        return qryEntregas.list();
+    }
+
+    public Entregas findEntregaByDataDestinatario(Date dataExpedicao, String destinatarioId){
+
+        String data = Util.getDateFormatYMD(dataExpedicao);
+
+        return app.getDaoSession().getEntregasDao().queryBuilder()
+                .where(EntregasDao.Properties.DataExpedicao.eq(data))
+                .where(EntregasDao.Properties.DestinatarioId.eq(destinatarioId))
+                .limit(1)
+                .unique();
+
+
+    }
+
+    public Entregas findEntregaById(Long id){
+
+        return app.getDaoSession().getEntregasDao().queryBuilder()
+                .where(EntregasDao.Properties.Id.eq(id)).unique();
+    }
+
+    public Entregas addEntregas(Long id, Long destinatarioId, String dataExpedicao,
+                                Boolean status, String latitude, String longitude, int ordemEntrega,
+                                boolean temPendencia){
+
+        Entregas entrega = findEntregaById(id);
+
+        if (entrega==null){
+            entrega = new Entregas();
+            entrega.setId(id);
+            entrega.setDestinatarioId(destinatarioId);
+            entrega.setDataExpedicao(dataExpedicao);
+            entrega.setStatus(status);
+            entrega.setLatitude(latitude);
+            entrega.setLongitude(longitude);
+            entrega.setOrdemEntrega(ordemEntrega);
+            entrega.setTemPendencia(temPendencia);
+
+            app.getDaoSession().insert(entrega);
+        }
+
+        return entrega;
     }
 
     public Romaneio addRomaneio(Long id, String numeroRomaneio, String dataRomaneio,
@@ -431,7 +551,7 @@ public class Manager {
                                   Long destinatarioCnpj, Long romaneioId, Double valor, Double peso,
                                   Double volumes, Long idOcorrencia, String dataOcorrencia,
                                   Long idConhecimentoNotasFiscais, Long idConhecimento,
-                                  Double distance, Double tempoEstimado, String cep) {
+                                  Double distance, Double tempoEstimado, String cep, Long idEntrega) {
 
 
         Documento documento = new Documento();
@@ -446,7 +566,7 @@ public class Manager {
             documento = new Documento(null,idNotaFiscalImp,dataEmissao,dataExpedicao,chaveNfe,
                      serie,numeroNotaFiscal,remetenteCnpj,destinatarioCnpj,romaneioId,
                          valor,peso,volumes,idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
-                    idConhecimento, distance, tempoEstimado, cep);
+                    idConhecimento, distance, tempoEstimado, cep, false, idEntrega, false);
             app.getDaoSession().insert(documento);
         } else {
 
@@ -559,9 +679,10 @@ public class Manager {
     }
 
     public List<OcorrenciaDocumento> findOcorrenciaNaoSincronizada(){
-        return app.getDaoSession().getOcorrenciaDocumentoDao().queryBuilder().where(
-                OcorrenciaDocumentoDao.Properties.Sincronizado.eq(0)
-        ).orderAsc(OcorrenciaDocumentoDao.Properties.Id).list();
+        return app.getDaoSession().getOcorrenciaDocumentoDao().queryBuilder()
+                .where(OcorrenciaDocumentoDao.Properties.Sincronizado.eq(0))
+                .where(OcorrenciaDocumentoDao.Properties.Finalizado.eq(true))
+                .orderAsc(OcorrenciaDocumentoDao.Properties.Id).list();
     }
 
     public List<ImagemOcorrencia> findImagensNaoSincronizada(){

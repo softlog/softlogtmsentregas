@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 
 /**
@@ -35,10 +36,12 @@ public class PrincipalFragmentFirst extends Fragment {
         activity = getActivity();
         lista_entregas = view.findViewById(R.id.lista_entrega);
 
+
         lista_entregas.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         lista_entregas.setLayoutManager(layoutManager);
         lista_entregas.setAdapter(((PrincipalDraweActivity) activity).adapterView);
+
 
         return view;
 

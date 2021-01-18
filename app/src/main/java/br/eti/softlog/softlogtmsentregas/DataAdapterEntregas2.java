@@ -1,35 +1,21 @@
 package br.eti.softlog.softlogtmsentregas;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import br.eti.softlog.adapters.DataAdapterImagemOcorrencia;
 import br.eti.softlog.model.Documento;
-import br.eti.softlog.model.ImagemOcorrencia;
-import br.eti.softlog.utils.MaskEditUtil;
 import br.eti.softlog.utils.RecyclerViewClickListener;
 import br.eti.softlog.utils.Util;
 
@@ -212,7 +198,7 @@ public class DataAdapterEntregas2 extends RecyclerView.Adapter<DataAdapterEntreg
             txtDistancia = view.findViewById(R.id.txtKm);
             txtDuracao = view.findViewById(R.id.txtDuracao);
             txtRemetente = view.findViewById(R.id.txtEmitente);
-            txtRomaneio = view.findViewById(R.id.txt_romaneio);
+            txtRomaneio = view.findViewById(R.id.txt_notas_fiscais);
             txtOcorrencia = view.findViewById(R.id.txt_ocorrencia);
             editTemp = new EditText(view.getContext());
             btnEntregar = view.findViewById(R.id.btn_entrega);

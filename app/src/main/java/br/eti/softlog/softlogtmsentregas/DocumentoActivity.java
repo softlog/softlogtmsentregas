@@ -89,7 +89,7 @@ public class DocumentoActivity extends AppCompatActivity {
         txtDadosGerais = findViewById(R.id.textDadosGerais);
         txtDadosRemetente = findViewById(R.id.textRemetente);
         txtDadosDestinatario = findViewById(R.id.textDestinatario);
-        txtRomaneio = findViewById(R.id.txt_romaneio);
+        txtRomaneio = findViewById(R.id.txt_notas_fiscais);
         txtDataExpedicaoRomaneio = findViewById(R.id.txt_data_expedicao_romaneio);
 
         txtOcorrencia = findViewById(R.id.txtOcorrencia);

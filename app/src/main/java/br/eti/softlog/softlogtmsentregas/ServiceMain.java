@@ -139,6 +139,7 @@ public class ServiceMain extends Service {
             d.sendOcorrencias();
             d.sendImagens();
             d.sendTracking();
+
         }
     }
 

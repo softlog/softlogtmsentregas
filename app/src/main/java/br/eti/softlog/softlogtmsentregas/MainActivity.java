@@ -476,7 +476,12 @@ public class MainActivity extends AppCompatActivity implements OnLocationUpdated
             Intent i = new Intent(getApplicationContext(), SettingsActivityMain.class);
             startActivity(i);
         } else if (id == R.id.data_corrente) {
-            showDialog(DATE_DIALOG_ID);
+            try{
+                showDialog(DATE_DIALOG_ID);
+            } catch (Exception e){
+                Log.d("Dialogo Data",e.getMessage());
+            }
+
 
         } else if (id == R.id.menu_mapa) {
 

@@ -81,6 +81,15 @@ public class OcorrenciaDocumento {
     @ToMany(referencedJoinProperty = "ocorrenciaDocumentoId")
     private List<ImagemOcorrencia> imagemOcorrencias;
 
+    @Property(nameInDb = "finalizado")
+    boolean finalizado;
+
+    @Property(nameInDb = "entrega_id")
+    Long entregaId;
+
+    @Property(nameInDb = "tem_canhoto")
+    boolean temCanhoto;
+
 /** Used to resolve relations */
 @Generated(hash = 2040040024)
 private transient DaoSession daoSession;
@@ -89,12 +98,13 @@ private transient DaoSession daoSession;
 @Generated(hash = 1805366801)
 private transient OcorrenciaDocumentoDao myDao;
 
-@Generated(hash = 1318772727)
+@Generated(hash = 1223682688)
 public OcorrenciaDocumento(Long id, Long documentoId, Long codigoOcorrencia,
         String dataOcorrencia, String horaOcorrencia, String dataRegistro,
         String documentoRecebedor, String nomeRecebedor, String observacoes,
         String latitude, String longitude, boolean sincronizado, String dataSincronizacao,
-        Long tarefaExecutadaId, Long idServidor) {
+        Long tarefaExecutadaId, Long idServidor, boolean finalizado, Long entregaId,
+        boolean temCanhoto) {
     this.id = id;
     this.documentoId = documentoId;
     this.codigoOcorrencia = codigoOcorrencia;
@@ -110,6 +120,9 @@ public OcorrenciaDocumento(Long id, Long documentoId, Long codigoOcorrencia,
     this.dataSincronizacao = dataSincronizacao;
     this.tarefaExecutadaId = tarefaExecutadaId;
     this.idServidor = idServidor;
+    this.finalizado = finalizado;
+    this.entregaId = entregaId;
+    this.temCanhoto = temCanhoto;
 }
 
 @Generated(hash = 1712609508)
@@ -398,6 +411,30 @@ public Long getIdServidor() {
 
 public void setIdServidor(Long idServidor) {
     this.idServidor = idServidor;
+}
+
+public boolean getFinalizado() {
+    return this.finalizado;
+}
+
+public void setFinalizado(boolean finalizado) {
+    this.finalizado = finalizado;
+}
+
+public Long getEntregaId() {
+    return this.entregaId;
+}
+
+public void setEntregaId(Long entregaId) {
+    this.entregaId = entregaId;
+}
+
+public boolean getTemCanhoto() {
+    return this.temCanhoto;
+}
+
+public void setTemCanhoto(boolean temCanhoto) {
+    this.temCanhoto = temCanhoto;
 }
 
 /** called by internal mechanisms, do not call yourself. */

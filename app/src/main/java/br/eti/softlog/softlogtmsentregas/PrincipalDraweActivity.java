@@ -8,9 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
@@ -21,11 +19,10 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import br.eti.softlog.model.Documento;
 import br.eti.softlog.model.DocumentoDao;
+import br.eti.softlog.model.Entregas;
 import br.eti.softlog.model.ImagemOcorrencia;
 import br.eti.softlog.model.OcorrenciaDocumento;
 import br.eti.softlog.model.Pessoa;
-import br.eti.softlog.utils.AppSingleton;
-import br.eti.softlog.utils.Connectivity;
 import br.eti.softlog.utils.RecyclerViewClickListener;
 import br.eti.softlog.utils.Util;
 import br.eti.softlog.viewmodel.PrincipalViewModel;
@@ -35,10 +32,9 @@ import de.cketti.fileprovider.PublicFileProvider;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
+
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputType;
@@ -49,17 +45,10 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.blankj.utilcode.util.ActivityUtils;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabItem;
@@ -71,36 +60,25 @@ import com.yanzhenjie.permission.Permission;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class PrincipalDraweActivity extends AppCompatActivity implements  NavigationView.OnNavigationItemSelectedListener{
 
     static final int DATE_DIALOG_ID = 0;
 
     PrincipalViewModel mViewModel;
-
     FloatingActionButton btnData;
     FloatingActionButton btnAtualizar;
 
     EntregasApp myapp;
-    Manager manager;
-    DataSync dataSync2;
-    Connectivity connectivity;
-    Context context;
-    Date dateSync;
-    Util util;
-    private FusedLocationProviderClient mFusedLocationClient;
 
-    public DataAdapterEntregas2 adapterView;
-    List<Documento> documentos;
-    List<Pessoa> entregas;
+    public DataAdapterEntregas3 adapterView;
+    public DataAdapterEntregas3 adapterView2;
 
-    ExtractRomaneioJson extractRomaneioJson;
-    ExtractOcorrenciaJson extractOcorrenciaJson;
+    List<Entregas> entregas;
+    List<Entregas> entregues;
 
     ProgressBar pbAtualizar;
 
@@ -109,8 +87,11 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
     NavigationView navigationView;
     ViewPager pager;
     TabLayout mTabLayout;
-    TabItem firstItem,secondItem,thirdItem;
+    TabItem firstItem, secondItem, thirdItem;
     PrincipalPagerAdapter adapter;
+    TextView txtDate;
+    TextView txtUsuario;
+
 
 
     @Override
@@ -120,26 +101,13 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Entregas");
-        context = this.getApplicationContext();
+
 
         mViewModel = ViewModelProviders.of(this).get(PrincipalViewModel.class);
         myapp = (EntregasApp) getApplicationContext();
-        manager = new Manager(myapp);
-        util = new Util();
 
         setPermissao();
-
-        Intent inCall = getIntent();
-        extractRomaneioJson = new ExtractRomaneioJson(getApplicationContext());
-        extractOcorrenciaJson = new ExtractOcorrenciaJson(getApplicationContext());
-        dataSync2 = new DataSync(getApplicationContext());
-        connectivity = new Connectivity();
         ActivityUtils.finishAllActivitiesExceptNewest();
-
-
-        ButterKnife.bind(this);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         pager = findViewById(R.id.viewpager);
         mTabLayout = findViewById(R.id.tablayout);
@@ -154,7 +122,10 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
         btnData = findViewById(R.id.fb_data);
         btnAtualizar = findViewById(R.id.fbAtualizar);
         btnAtualizar.hide();
+        txtDate = findViewById(R.id.txt_date);
+
         pbAtualizar = findViewById(R.id.pb_atualizar);
+
 
 
         pbAtualizar.setVisibility(View.INVISIBLE);
@@ -189,17 +160,19 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
 
         RecyclerViewClickListener listener = (view, position) -> {
 
-            Documento documento = (Documento) documentos.get(position);
+            /*
+            mViewModel.get
 
             // cria a intent
             Intent intent = new Intent(getApplicationContext(), DocumentoActivity.class);
 
             // seta o parametro do medico a exibir os dados
-            intent.putExtra("id_documento", documento.getId().toString());
+            intent.putExtra("id_destinatario", entrega.getId().toString());
 
             //  chama a Activity que mostra os detalhes
             startActivity(intent);
             finish();
+             */
 
         };
 
@@ -207,14 +180,16 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
 
         //Operacoes do Dia
         mViewModel.loadDocumentos(myapp.getDate());
-        documentos = mViewModel.getDocumentos();
-        adapterView = new DataAdapterEntregas2(getApplicationContext(), documentos, myapp, listener);
-        Date data_corrente = myapp.getDate();
+        entregas = mViewModel.getEntregas();
+        entregues = mViewModel.getEntregues();
 
-        mViewModel.getDocumentosLiveData().observe(this,documentoListUpdateObserver);
+        adapterView = new DataAdapterEntregas3(getApplicationContext(), mViewModel.getEntregas(), myapp, listener);
+        mViewModel.getEntregasLiveData().observe(this,entregaListUpdateObserver);
 
-        //adapterView = new DataAdapterEntregas(getApplicationContext(), documentos, myapp, listener);
-        this.dataSync(data_corrente);
+        adapterView2 = new DataAdapterEntregas3(getApplicationContext(), mViewModel.getEntregues(), myapp, listener);
+        mViewModel.getEntreguesLiveData().observe(this,entregueListUpdateObserver);
+
+        this.dataSync();
 
         Intent intentSource = getIntent();
         String flagServico = intentSource.getStringExtra("flagServico");
@@ -234,14 +209,16 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
         btnAtualizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reloadAllData();
+                mViewModel.loadDocumentos(myapp.getDate());
                 btnAtualizar.hide();
             }
         });
 
+        //txtUsuario.setText(myapp.getUsuario().getNome());
+        txtDate.setText(Util.getDateFormat(myapp.getDate()));
+        //mViewModel.sendOcorrencias();
 
-        mViewModel.sendOcorrencias();
-
+        /*
         mViewModel.getOutputWorkInfo().observe(this, listOfWorkInfo -> {
 
             // If there are no matching work info, do nothing
@@ -259,20 +236,32 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                 //TODO:
             }
         });
+         */
 
     }
 
-    Observer<List<Documento>> documentoListUpdateObserver = new Observer<List<Documento>>() {
+    Observer<List<Pessoa>> entregaListUpdateObserver = new Observer<List<Pessoa>>() {
         @Override
-        public void onChanged(List<Documento> documentosList) {
+        public void onChanged(List<Pessoa> entregaList) {
 
-            Log.d("WorkManager","Atualizando lista! " + String.valueOf(mViewModel.getDocumentos().size()));
+            Log.d("WorkManager","Atualizando lista! " + String.valueOf(mViewModel.getEntregas().size()));
 
             adapterView.getData().clear();
-            adapterView.getData().addAll(mViewModel.getDocumentos());
-            // fire the event
+            adapterView.getData().addAll(mViewModel.getEntregas());
             adapterView.notifyDataSetChanged();
 
+        }
+    };
+
+    Observer<List<Pessoa>> entregueListUpdateObserver = new Observer<List<Pessoa>>() {
+        @Override
+        public void onChanged(List<Pessoa> entregaList) {
+
+            Log.d("WorkManager","Atualizando lista! " + String.valueOf(mViewModel.getEntregues().size()));
+
+            adapterView2.getData().clear();
+            adapterView2.getData().addAll(mViewModel.getEntregues());
+            adapterView2.notifyDataSetChanged();
         }
     };
 
@@ -305,9 +294,11 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
             @Override
             public boolean onQueryTextSubmit(String query) {
 
+
                 try {
 
 
+                    /*
                     String data = Util.getDateFormatYMD(myapp.getDate());
 
                     QueryBuilder queryBuilder = myapp.getDaoSession().getDocumentoDao().queryBuilder()
@@ -336,6 +327,8 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                 }
 
 
+
+
                 return false;
             }
 
@@ -361,23 +354,15 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
             startActivity(iScanner);
 
         } else if (id == R.id.localizar) {
-
-/*            try {
+           /*
+           try {
                 dataSync.sendProtocolos();
             } catch (JSONException e) {
                 e.printStackTrace();
           }*/
-
-
-
         } else if (id == R.id.atualizar) {
-
-
-            //documentos = manager.findDocumentoByDataRomaneio(myapp.getDate());
-            reloadAllData();
-            //loadOcorrencias();
+            mViewModel.loadDocumentos(myapp.getDate());
             alert("Dados Atualizados.");
-
         } else if (id == R.id.sincronizar) {
             /*
             this.dataSync(myapp.getDate());
@@ -388,6 +373,7 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
 
         } else if (id == R.id.reenvio_imagens) {
 
+            /*
             for (Documento documento:documentos){
                 for (OcorrenciaDocumento oco:documento.getOcorrenciaDocumentos()){
                     for (ImagemOcorrencia img:oco.getImagemOcorrencias()){
@@ -396,8 +382,10 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                     }
                 }
             }
-        } else if (id == R.id.reenvio_ocorrencia) {
 
+             */
+        } else if (id == R.id.reenvio_ocorrencia) {
+            /*
             for (Documento documento:documentos){
                 for (OcorrenciaDocumento oco:documento.getOcorrenciaDocumentos()){
                     oco.setSincronizado(false);
@@ -405,8 +393,10 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                 }
             }
 
-            dataSync2.sendOcorrencias();
-            dataSync2.sendImagens();
+             */
+
+            //dataSync2.sendOcorrencias();
+            //dataSync2.sendImagens();
 
         } else if (id == R.id.send_log) {
 
@@ -455,9 +445,12 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
 
 
         } else if (id == R.id.config) {
+
             Intent i = new Intent(getApplicationContext(), SettingsActivityMain.class);
             startActivity(i);
+
         } else if (id == R.id.data_corrente) {
+
             showDialog(DATE_DIALOG_ID);
 
         } else if (id == R.id.menu_mapa) {
@@ -466,10 +459,12 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
             startActivity(intent);
 
         } else if (id == R.id.exit) {
+
             myapp.logout();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -481,33 +476,20 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
     }
 
 
-    private void dataSync(Date data) {
+    private void dataSync() {
 
-        reloadAllData();
-
-        if (!connectivity.isConnected(getApplicationContext())) {
-            return;
-        }
-
-        boolean r = myapp.getConfigDownloadMobile();
-
-        if (connectivity.isConnectedMobile(getApplicationContext())) {
-            if (!myapp.getConfigDownloadMobile()) {
-                return;
-            }
-        }
-
-        dateSync = data;
+        Log.d("WorkManager DataSync",myapp.getDate().toString());
+        mViewModel.loadDocumentos(myapp.getDate());
 
         Data inputData = new Data.Builder()
-                .putString("data",Util.getDateFormatYMD(dateSync))
+                .putString("data",Util.getDateFormatYMD(myapp.getDate()))
                 .build();
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
-        pbAtualizar.setVisibility(View.VISIBLE);
+
 
         OneTimeWorkRequest otwRequest =
                 new OneTimeWorkRequest.Builder(DocumentosWorker.class)
@@ -519,41 +501,26 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                 .observe(this, new Observer<WorkInfo>() {
                     @Override
                     public void onChanged(@Nullable WorkInfo workInfo) {
+                        pbAtualizar.setVisibility(View.VISIBLE);
                         Log.d("WorkManager",workInfo.getState().toString());
                         if (workInfo != null && workInfo.getState() == WorkInfo.State.FAILED) {
 
                             pbAtualizar.setVisibility(View.INVISIBLE);
                             pbAtualizar.setVisibility(View.GONE);
+
                         }
 
                         if (workInfo != null && workInfo.getState() == WorkInfo.State.SUCCEEDED) {
                             pbAtualizar.setVisibility(View.INVISIBLE);
                             pbAtualizar.setVisibility(View.GONE);
-                            reloadAllData();
-                            //btnAtualizar.show();
+                            Log.d("WorkManager",myapp.getDate().toString());
+                            mViewModel.loadDocumentos(myapp.getDate());
                         }
                     }
                 });
 
     }
 
-
-
-    private void reloadAllData() {
-        // get new modified random data
-        // update data in our adapter
-        Log.d("WorkManager",myapp.getDate().toString());
-        mViewModel.loadDocumentos(myapp.getDate());
-
-
-        try {
-            //getDistanceDuration();
-        } catch (Exception e) {
-            Log.d("erro", e.getMessage());
-        }
-
-
-    }
 
 
     @Override
@@ -578,46 +545,16 @@ public class PrincipalDraweActivity extends AppCompatActivity implements  Naviga
                                       int dayOfMonth) {
 
 
-                    Date data_corrente = getDate(year, monthOfYear, dayOfMonth);
-
-                    String dataExtenso = getDateFormat(data_corrente);
-                    //txtDate.setText(dataExtenso);
-
+                    Date data_corrente = Util.getDate(year, monthOfYear, dayOfMonth);
                     myapp.setDate(data_corrente);
+                    txtDate.setText(Util.getDateFormat(myapp.getDate()));
+                    dataSync();
 
-                    entregas = manager.findPessoasByDataRomaneio(myapp.getDate());
-
-                    dataSync(data_corrente);
-
-                    try {
-                    //    getDistanceDuration();
-                    } catch (Exception e ){
-
-                    }
-
-//                  reloadAllData();
-
-//                    Log.d("Quantidade", String.valueOf(protocolos.size()));
                 }
             };
 
-    public static Date getDate(int year, int month, int day) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.MONTH, month);
-        cal.set(Calendar.DAY_OF_MONTH, day);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
 
-    public static String getDateFormat(Date data) {
-        DateFormat formatador = DateFormat.getDateInstance(DateFormat.FULL, new Locale("pt", "BR"));
-        String dataExtenso = formatador.format(data);
-        return dataExtenso;
-    }
+
 
     public void setPermissao(){
         AndPermission.with(this)

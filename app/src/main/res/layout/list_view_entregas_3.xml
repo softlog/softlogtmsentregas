@@ -10,14 +10,47 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_principal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="8dp"
-        android:clickable="false">
+        android:clickable="false"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:contentPadding="4dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
+            <ImageButton
+                android:id="@+id/btn_entrega"
+                style="@style/Widget.AppCompat.ImageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/primary_light"
+                android:contentDescription="Entrega Realizada"
+                android:elevation="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtKm"
+                app:srcCompat="@drawable/ic_action_entrega_ok" />
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/primary_light"
+                android:elevation="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn_entrega"
+                app:layout_constraintTop_toBottomOf="@+id/txtKm"
+                app:srcCompat="@drawable/ic_action_entrega_pendente" />
 
             <TextView
                 android:id="@+id/entregaEndereco"
@@ -26,12 +59,13 @@
                 android:layout_gravity="start"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:text="RUA H-66 QD 182 LT 01 S/N"
                 android:textAlignment="viewStart"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/entregaDestinatario" />
 
             <TextView
@@ -40,11 +74,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:text="PAULO SERGIO ALVES"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView16" />
 
             <TextView
@@ -53,11 +88,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:text="CIDADE VERA CRUZ"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/entregaEndereco" />
 
             <TextView
@@ -68,7 +104,7 @@
                 android:layout_marginStart="8dp"
                 android:text="74936-170"
                 android:textSize="13sp"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/entregaBairro" />
 
             <TextView
@@ -91,77 +127,40 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 android:text="TELEFONE: 62 8142-5210"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/entregaCidade" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="0dp"
-                android:layout_height="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/btn_entrega" />
-
-            <TextView
-                android:id="@+id/txtColor"
-                android:layout_width="8dp"
-                android:layout_height="0dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_entrega"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/entregaCidade" />
 
             <TextView
                 android:id="@+id/textView16"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:text="Local de Entrega"
+                android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:text="LOCAL DE ENTREGA"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@android:color/white"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/txtEmitente" />
-
-            <TextView
-                android:id="@+id/txtEmitente"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="TextView"
-                android:textSize="13sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/textView18"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Km"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/txtKm"
-                app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
 
             <TextView
                 android:id="@+id/txtKm"
@@ -169,10 +168,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="1000.9"
                 android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
 
             <TextView
                 android:id="@+id/textView22"
@@ -180,10 +180,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Duração:"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/textView18"
-                app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
 
             <TextView
                 android:id="@+id/txtDuracao"
@@ -193,79 +194,52 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
-                android:text="TextView"
+                android:layout_marginTop="8dp"
+                android:text="0"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/textView22"
+                app:layout_constraintTop_toBottomOf="@+id/txt_notas_fiscais" />
+
+            <TextView
+                android:id="@+id/txt_notas_fiscais"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
+            <TextView
+                android:id="@+id/textView20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="Notas Fiscais:"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
 
             <TextView
-                android:id="@+id/txt_romaneio"
+                android:id="@+id/txt_qtd_notas"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="TextView"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/txtDuracao" />
-
-            <TextView
-                android:id="@+id/txt_ocorrencia"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:text="TextView"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:text="10"
                 android:textColor="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/entregaBairro"
-                app:layout_constraintTop_toBottomOf="@+id/txt_romaneio" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/textView20"
+                app:layout_constraintTop_toBottomOf="@+id/entregaTelefone" />
 
-            <ImageButton
-                android:id="@+id/btn_entrega"
-                style="@style/Widget.AppCompat.ImageButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:background="@android:color/white"
-                android:contentDescription="Entrega Realizada"
-                android:elevation="8dp"
-                app:layout_constraintStart_toEndOf="@+id/txtColor"
-                app:layout_constraintTop_toBottomOf="@+id/txt_ocorrencia"
-                app:srcCompat="@drawable/ic_action_entrega_ok" />
 
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:elevation="8dp"
-                android:background="@android:color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/btn_entrega"
-                app:srcCompat="@drawable/ic_action_entrega_pendente" />
-
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textView2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_action_entrega_ok" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

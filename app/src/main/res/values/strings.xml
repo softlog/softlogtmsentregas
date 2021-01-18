@@ -234,6 +234,11 @@
     <string name="title_activity_ocorrencias_list">OcorrenciasListActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_mapas_entrega2">Map</string>
+    <string name="open">Abrir</string>
+
+    <string name="close">Fechar</string>
+    <string name="default_notification_channel_id">1</string>
+
     <string-array name="pref_intervalLabels">
         <item>10 seconds</item>
         <item>20 seconds</item>
@@ -245,7 +250,6 @@
         <item>80 seconds</item>
         <item>90 seconds</item>
     </string-array>
-
     <string-array name="pref_intervalValues">
         <item>10</item>
         <item>20</item>
@@ -278,8 +282,4 @@
         <item>0.90</item>
         <item>0.95</item>
     </string-array>
-
-    <string name="open">Abrir</string>
-    <string name="close">Fechar</string>
-    <string name="default_notification_channel_id">1</string>
 </resources>

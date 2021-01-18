@@ -6,26 +6,23 @@
     <application
         android:name=".EntregasApp"
         android:allowBackup="true"
-        android:appComponentFactory="whateverString"
         android:icon="@drawable/icone"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icone"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
-        tools:replace="android:appComponentFactory">
-        <activity android:name=".BarCodeActivity"></activity>
+        android:usesCleartextTraffic="true">
+        <activity android:name=".OcorrenciaStepActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"></activity>
+        <activity
+            android:name=".PrincipalDraweActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MapasEntrega2"
+            android:label="@string/title_activity_mapas_entrega2" />
+        <activity android:name=".RegistroCanhotoActivity" />
         <activity android:name=".ImagensOcorrencias" />
-
-        <activity android:name=".LoadActivity" /> <!-- <provider -->
-        <!-- android:name=".GenericFileProvider" -->
-        <!-- android:authorities="${applicationId}.provider" -->
-        <!-- android:exported="false" -->
-        <!-- android:grantUriPermissions="true"> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.FILE_PROVIDER_PATHS" -->
-        <!-- android:resource="@xml/file_provider_paths"/> -->
-        <!-- </provider> -->
+        <activity android:name=".LoadActivity" />
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
@@ -50,8 +47,8 @@
         <activity
             android:name=".DocumentoActivity"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" /> <!-- Splash screen -->
-        <activity android:name=".TakePhotoActivity" />
+            tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".TakePhotoActivity" /> <!-- Splash screen -->
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
@@ -64,9 +61,12 @@
             android:name=".DocumentoMainActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".BarCode2Activity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".DocumentosEntregaActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity
@@ -91,10 +91,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-        </activity> <!-- optional (needed if default theme has no action bar) -->
+        </activity>
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps" /> <!-- optional (needed if default theme has no action bar) -->
         <activity android:name=".chart_teste" />
         <activity
             android:name=".OcorrenciasListActivity"
@@ -102,13 +102,14 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
         <activity android:name=".OrganogramaActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
         <meta-data
             android:name="io.sentry.dsn"
             android:value="https://a43a167e431f40c79210131ee5a6be93@sentry.io/4465974" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAy0I2Hm7-KpSycRw8rYH63bb6qzQqZl_8" />
         <provider
             android:name="de.cketti.fileprovider.PublicFileProvider"
             android:authorities="com.mydomain.publicfileprovider"
@@ -138,6 +139,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -145,9 +147,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 </manifest>

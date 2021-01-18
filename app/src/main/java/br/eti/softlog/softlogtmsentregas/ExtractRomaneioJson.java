@@ -44,6 +44,7 @@ public class ExtractRomaneioJson {
             //Gravando Cidades
             JSONArray cidades = jObj.getJSONArray("cidades");
 
+            app.getDb().beginTransaction();
             for(int i = 0;i<cidades.length();i++){
                 JSONObject cidade = cidades.getJSONObject(i);
                 Long idCidade = cidade.getLong("id_cidade");
@@ -77,6 +78,7 @@ public class ExtractRomaneioJson {
                 else
                     tipoPessoa = 1;
 
+                Log.d("Pessoa",nome);
                 manager.addPessoa(id,tipoPessoa,nome,cnpjCpf,endereco,numero,
                         bairro, idCidade,cep,telefone,null,
                         null,latitude,longitude);
@@ -149,6 +151,35 @@ public class ExtractRomaneioJson {
                         bExigeRecebedor, bExigeRecebedor, bExigeImagem);
 
             }
+            //Grava as entregas
+            JSONArray entregas = jObj.getJSONArray("entregas");
+            for(int i = 0; i < entregas.length();i++){
+                JSONObject entrega = entregas.getJSONObject(i);
+                Long idEntrega =  entrega.getLong("id_entrega");
+                Log.d("Id Entrega",String.valueOf(idEntrega));
+                Long destinatarioId = Long.valueOf(entrega.getLong("destinatario_cnpj"));
+                String dataExpedicao = entrega.getString("data_expedicao");
+                int statusI = entrega.getInt("status");
+                int temPendenciaI = entrega.getInt("tem_pendencia");
+                String latitude = entrega.getString("latitude");
+                String longitude = entrega.getString("longitude");
+                int ordemEntrega = entrega.getInt("ordem_entrega");
+
+                boolean status;
+                if (statusI==1)
+                    status = true;
+                else
+                    status = false;
+
+                boolean temPendencia;
+                if (temPendenciaI==1)
+                    temPendencia = true;
+                else
+                    temPendencia = false;
+
+                manager.addEntregas(idEntrega,destinatarioId,dataExpedicao,status,latitude,longitude,ordemEntrega,temPendencia);
+
+            }
 
             //Gravando Romaneios
             JSONArray romaneios = jObj.getJSONArray("romaneios");
@@ -197,11 +228,16 @@ public class ExtractRomaneioJson {
                         idNotaFiscalImp = null;
                     }
 
+                    if (j > 47) {
+                        Log.d("Tag","Investigando");
+                    }
+
                     String dataEmissao = documento.getString("data_emissao");
                     String dataExpedicao = documento.getString("data_expedicao");
                     String chaveNfe = documento.getString("chave_nfe");
                     String serie = documento.getString("serie");
                     String numeroNotaFiscal = documento.getString("numero_nota_fiscal");
+                    Log.d("NFe",chaveNfe);
                     Long remetenteCnpj = documento.getLong("remetente_cnpj");
                     Long destinatarioCnpj = documento.getLong("destinatario_cnpj");
                     Long romaneioId = documento.getLong("id_romaneio");
@@ -211,6 +247,7 @@ public class ExtractRomaneioJson {
                     Long idOcorrencia = documento.getLong("id_ocorrencia");
                     String dataOcorrencia1 = documento.getString("data_ocorrencia");
                     String cep = documento.getString("cep");
+                    Long idEntrega = documento.getLong("id_entrega");
                     String dataOcorrencia;
 
                     Long idConhecimentoNotasFiscais;
@@ -238,13 +275,16 @@ public class ExtractRomaneioJson {
                             chaveNfe,serie,numeroNotaFiscal,remetenteCnpj,
                             destinatarioCnpj,romaneioId,valor,peso,volumes,
                             idOcorrencia,dataOcorrencia, idConhecimentoNotasFiscais,
-                            idConhecimento, 0.0, 0.0, cep);
+                            idConhecimento, 0.0, 0.0, cep, idEntrega);
 
                 }
             }
-
+            app.getDb().setTransactionSuccessful();
         } catch (JSONException e1) {
             e1.printStackTrace();
+            Log.d("Importacao Romaneio", e1.getMessage());
+        } finally {
+            app.getDb().endTransaction();
         }
     }
 

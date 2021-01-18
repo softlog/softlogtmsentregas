@@ -104,6 +104,20 @@ public class Documento {
     @Property(nameInDb = "cep")
     private String cep;
 
+    @Property(nameInDb = "selected")
+    private boolean Selected;
+
+    @Property(nameInDb = "entrega_id")
+    private Long entregaId;
+
+    @ToOne(joinProperty = "entregaId")
+    Entregas entrega;
+
+    @Property(nameInDb = "tem_canhoto")
+    boolean temCanhoto;
+
+
+
 /** Used to resolve relations */
 @Generated(hash = 2040040024)
 private transient DaoSession daoSession;
@@ -112,14 +126,13 @@ private transient DaoSession daoSession;
 @Generated(hash = 177588185)
 private transient DocumentoDao myDao;
 
-@Generated(hash = 1692362587)
-public Documento(Long id, Long idNotaFiscalImp, String dataEmissao,
-        String dataExpedicao, String chaveNfe, String serie,
-        String numeroNotaFiscal, Long remetenteCnpj, Long destinatarioCnpj,
-        Long romaneioId, Double valor, Double peso, Double volumes,
-        Long idOcorrencia, String dataOcorrencia,
-        Long idConhecimentoNotasFiscais, Long idConhecimento, Double distance,
-        Double tempoEstimado, String cep) {
+@Generated(hash = 1847628385)
+public Documento(Long id, Long idNotaFiscalImp, String dataEmissao, String dataExpedicao,
+        String chaveNfe, String serie, String numeroNotaFiscal, Long remetenteCnpj,
+        Long destinatarioCnpj, Long romaneioId, Double valor, Double peso, Double volumes,
+        Long idOcorrencia, String dataOcorrencia, Long idConhecimentoNotasFiscais,
+        Long idConhecimento, Double distance, Double tempoEstimado, String cep,
+        boolean Selected, Long entregaId, boolean temCanhoto) {
     this.id = id;
     this.idNotaFiscalImp = idNotaFiscalImp;
     this.dataEmissao = dataEmissao;
@@ -140,6 +153,9 @@ public Documento(Long id, Long idNotaFiscalImp, String dataEmissao,
     this.distance = distance;
     this.tempoEstimado = tempoEstimado;
     this.cep = cep;
+    this.Selected = Selected;
+    this.entregaId = entregaId;
+    this.temCanhoto = temCanhoto;
 }
 
 @Generated(hash = 2067782857)
@@ -407,6 +423,9 @@ public void setRomaneio(Romaneio romaneio) {
 @Generated(hash = 1723205787)
 private transient Long ocorrencia__resolvedKey;
 
+@Generated(hash = 613319668)
+private transient Long entrega__resolvedKey;
+
 /** To-one relationship, resolved on first access. */
 @Generated(hash = 887810511)
 public Ocorrencia getOcorrencia() {
@@ -501,6 +520,59 @@ public void update() {
         throw new DaoException("Entity is detached from DAO context");
     }
     myDao.update(this);
+}
+
+public boolean getSelected() {
+    return this.Selected;
+}
+
+public void setSelected(boolean Selected) {
+    this.Selected = Selected;
+}
+
+public Long getEntregaId() {
+    return this.entregaId;
+}
+
+public void setEntregaId(Long entregaId) {
+    this.entregaId = entregaId;
+}
+
+/** To-one relationship, resolved on first access. */
+@Generated(hash = 1185742007)
+public Entregas getEntrega() {
+    Long __key = this.entregaId;
+    if (entrega__resolvedKey == null || !entrega__resolvedKey.equals(__key)) {
+        final DaoSession daoSession = this.daoSession;
+        if (daoSession == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+        EntregasDao targetDao = daoSession.getEntregasDao();
+        Entregas entregaNew = targetDao.load(__key);
+        synchronized (this) {
+            entrega = entregaNew;
+            entrega__resolvedKey = __key;
+        }
+    }
+    return entrega;
+}
+
+/** called by internal mechanisms, do not call yourself. */
+@Generated(hash = 959071249)
+public void setEntrega(Entregas entrega) {
+    synchronized (this) {
+        this.entrega = entrega;
+        entregaId = entrega == null ? null : entrega.getId();
+        entrega__resolvedKey = entregaId;
+    }
+}
+
+public boolean getTemCanhoto() {
+    return this.temCanhoto;
+}
+
+public void setTemCanhoto(boolean temCanhoto) {
+    this.temCanhoto = temCanhoto;
 }
 
 /** called by internal mechanisms, do not call yourself. */

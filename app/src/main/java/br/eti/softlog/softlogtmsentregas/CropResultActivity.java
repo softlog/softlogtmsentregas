@@ -186,9 +186,9 @@ public final class CropResultActivity extends AppCompatActivity {
                 Date date = new Date();
                 String cData = util.getDateTimeFormatYMD(date);
 
-                String nameFile = app.getUsuario().getCpf().toString() + "_" +
+                String nameFile = app.getUsuario().getCpf() + "_" +
                         app.getUsuario().getCodigoAcesso() + "_" +
-                        documento.getChaveNfe().toString() + "_"
+                        documento.getChaveNfe() + "_"
                         + String.valueOf(imagemOcorrencia.getId()) + ".jpg";
 
 
@@ -234,12 +234,6 @@ public final class CropResultActivity extends AppCompatActivity {
                 }
 
 
-//                try {
-//                    MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//
-//                }
 
                 File file2 = null;
                 try {
@@ -253,12 +247,7 @@ public final class CropResultActivity extends AppCompatActivity {
                         documento.getChaveNfe().toString() + "_"
                         + String.valueOf(imagemOcorrencia.getId());
 
-                File file3;
-//                try {
-//                    fOut = new FileOutputStream(file);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
+
 
                 try {
                     int width = app.getConfigResolucao();
@@ -274,24 +263,13 @@ public final class CropResultActivity extends AppCompatActivity {
                             .getResizedFile();
 
 
-//                    file3 = new Compressor(this)
-//                            .setMaxWidth(640)
-//                            .setMaxHeight(480)
-//                            .setQuality(75)
-//                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
-//                            .setDestinationDirectoryPath(path)
-//                            .compressToFile(file2);
-
-//                    try {
-//                        MediaStore.Images.Media.insertImage(getContentResolver(), file3.getAbsolutePath(), file3.getName(), file3.getName());
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//
-//                    }
+                    resizedImage = null;
 
                 } catch (IOException e) {
                     //Log.d("erro",e.getMessage());
                     e.printStackTrace();
+                } finally {
+                    file2 = null;
                 }
 
 
@@ -372,7 +350,7 @@ public final class CropResultActivity extends AppCompatActivity {
                 //Saving the Bitmap to a file compressed as a JPEG with 85% compression rate
 
                 pictureBitmap.recycle();
-
+                pictureBitmap = null;
                 //resized.recycle();
                 //resized= null;
 
@@ -409,7 +387,7 @@ public final class CropResultActivity extends AppCompatActivity {
                         imagemOcorrencia.getOcorrenciaDocumento().getDocumento().getChaveNfe().toString() + "_"
                         + String.valueOf(imagemOcorrencia.getId());
 
-                File file3;
+
 //                try {
 //                    fOut = new FileOutputStream(file);
 //                } catch (FileNotFoundException e) {
@@ -432,6 +410,8 @@ public final class CropResultActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     //Log.d("erro",e.getMessage());
                     e.printStackTrace();
+                } finally {
+                    file2 = null;
                 }
             } else {
                 Uri imageUri = intent.getParcelableExtra("URI");

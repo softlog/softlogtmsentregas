@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.stepstone.stepper.StepperLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stepperLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+
+    app:ms_backButtonText="Anterior"
+    app:ms_backButtonColor="@color/ms_white"
+    app:ms_backButtonBackground="@color/colorPrimary"
+
+    app:ms_nextButtonColor="@color/ms_white"
+    app:ms_nextButtonBackground="@color/colorPrimary"
+    app:ms_nextButtonText="Próximo"
+
+
+    app:ms_completeButtonColor="@color/ms_white"
+    app:ms_completeButtonBackground="@color/colorPrimary"
+    app:ms_completeButtonText="Finalizar"
+
+    app:ms_bottomNavigationBackground="@color/colorPrimary"
+    app:ms_stepperType="tabs" />

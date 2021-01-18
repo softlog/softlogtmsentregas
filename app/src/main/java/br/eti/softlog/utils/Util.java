@@ -72,6 +72,40 @@ public final class Util {
         return dataFormatada;
     }
 
+    public static String getDateFormat(String data)  {
+
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dData;
+        String dataFormatada;
+        dataFormatada = "";
+        try {
+            dData = formato.parse(data);
+            formato.applyPattern("dd/MM/yyyy HH:mm");
+            dataFormatada = formato.format(dData);
+
+        } catch (ParseException e) {
+            e.printStackTrace();e.printStackTrace();
+        }
+        return dataFormatada;
+    }
+
+    public static String getDateFormat2(String data)  {
+
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date dData;
+        String dataFormatada;
+        dataFormatada = "";
+        try {
+            dData = formato.parse(data);
+            formato.applyPattern("dd/MM/yyyy HH:mm");
+            dataFormatada = formato.format(dData);
+
+        } catch (ParseException e) {
+            e.printStackTrace();e.printStackTrace();
+        }
+        return dataFormatada;
+    }
+
     public static  String getDateTimeFormatYMD(Date data) {
 
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -112,6 +146,9 @@ public final class Util {
 
         return phrase.toString();
     }
+
+
+
 
     public static void appendLog(String text, String pathFile)
     {

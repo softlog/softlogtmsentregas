@@ -2,6 +2,7 @@ package br.eti.softlog.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.pixplicity.easyprefs.library.Prefs;
 
@@ -22,6 +23,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import br.eti.softlog.model.Documento;
+import br.eti.softlog.model.Entregas;
 import br.eti.softlog.model.Pessoa;
 import br.eti.softlog.softlogtmsentregas.DataAdapterEntregas;
 import br.eti.softlog.softlogtmsentregas.EntregasApp;
@@ -35,15 +37,11 @@ public class PrincipalViewModel extends AndroidViewModel {
 
     private Manager manager;
 
-    private MutableLiveData<List<Documento>> documentosLiveData;
+    private MutableLiveData<List<Entregas>> entregasLiveData;
+    private MutableLiveData<List<Entregas>> entreguesLiveData;
 
-    private MutableLiveData<List<Pessoa>> entregasLiveData;
-    private MutableLiveData<List<Pessoa>> entreguesLiveData;
-
-
-    private List<Documento> documentos;
-    private List<Pessoa> entregas;
-    private List<Pessoa> entregues;
+    private List<Entregas> entregas;
+    private List<Entregas> entregues;
 
     private ExtractRomaneioJson extractRomaneioJson;
     private ExtractOcorrenciaJson extractOcorrenciaJson;
@@ -51,46 +49,41 @@ public class PrincipalViewModel extends AndroidViewModel {
     private WorkManager mWorkManager;
     private LiveData<List<WorkInfo>> mSavedWorkInfo;
 
+    private EntregasApp app;
+
     public PrincipalViewModel(Application application){
         super(application);
+
         manager = new Manager((EntregasApp) application);
-        documentosLiveData = new MutableLiveData<>();
         entregasLiveData = new MutableLiveData<>();
         entreguesLiveData = new MutableLiveData<>();
-
+        app = (EntregasApp) application;
         mWorkManager = WorkManager.getInstance(application.getApplicationContext());
 
     }
 
-    public List<Documento> getDocumentos(){
-        return documentos;
-    }
-
-    public List<Pessoa> getEntregas(){
+    public List<Entregas> getEntregas(){
         return entregas;
     }
 
-    public List<Pessoa> getEntregues(){
+    public List<Entregas> getEntregues(){
         return entregues;
     }
 
     public void loadDocumentos(Date Data){
-        documentos = manager.findDocumentoByDataRomaneio(Data);
-        documentosLiveData.setValue(documentos);
 
-        entregas = manager.findPessoasByDataRomaneio(Data, false);
-        entreguesLiveData.setValue(entregas);
+        app.getDaoSession().clear();
+        entregas = manager.findEntregasByDataStatus(Data, false);
+        Log.d("WorkManager","Documentos para entregar " + String.valueOf(getEntregas().size()));
+        entregasLiveData.setValue(entregas);
 
-        entregues = manager.findPessoasByDataRomaneio(Data, true);
+        entregues = manager.findEntregasByDataStatus(Data, true);
+        Log.d("WorkManager","Documentos Finalizados " + String.valueOf(getEntregues().size()));
         entreguesLiveData.setValue(entregues);
 
     }
 
 
-
-    public MutableLiveData getDocumentosLiveData(){
-        return documentosLiveData;
-    }
 
     public MutableLiveData getEntregasLiveData(){
         return entregasLiveData;

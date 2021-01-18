@@ -47,6 +47,7 @@ public class EntregasApp extends MultiDexApplication {
     private static EntregasApp singleton;
 
     private DaoSession mDaoSession;
+    private SQLiteDatabase db;
     //DaoMaster.DevOpenHelper helper;
     DatabaseUpgradeHelper helper;
     private Usuario usuario;
@@ -81,11 +82,7 @@ public class EntregasApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-
-
-
         Utils.init(this);
-
 
         new Prefs.Builder()
                 .setContext(this)
@@ -122,19 +119,9 @@ public class EntregasApp extends MultiDexApplication {
 
         mPowerManager = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
         // Save a handle to our SharedPreferences
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // Reset tracking state when application/activity is created
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("pref_onoff", false);
-        editor.commit();
+        Prefs.putBoolean("pref_onoff",false);
 
 
-
-        //initLogManager();// init LogManager before you use it to print log
-        //LogUtil.writeLogs(DEBUG);
-
-        //mDaoSession = new DaoMaster(new DaoMaster.DevOpenHelper(this, "conference.db").getWritableDb()).newSession();
     }
 
     public String getNameDb() {
@@ -159,7 +146,7 @@ public class EntregasApp extends MultiDexApplication {
     public void setBD(String nome_bd){
         //helper = new DaoMaster.DevOpenHelper(this,nome_bd,null);
         helper = new DatabaseUpgradeHelper(getApplicationContext(),nome_bd);
-        SQLiteDatabase db = helper.getWritableDatabase();
+        db = helper.getWritableDatabase();
 
         //db.execSQL("DROP TABLE tracking_gps");
 //        db.execSQL("CREATE TABLE tracking_gps(_id INTEGER, placa_veiculo TEXT, motorista_cpf TEXT, " +
@@ -206,6 +193,9 @@ public class EntregasApp extends MultiDexApplication {
         logFile = null;
     }
 
+    public SQLiteDatabase getDb(){
+        return db;
+    }
     public String getFileLog(){
         return fileLog;
     }
@@ -255,11 +245,7 @@ public class EntregasApp extends MultiDexApplication {
     }
 
     public void logout() {
-        SharedPreferences pref;
-        pref = getSharedPreferences("info", MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.clear();
-        editor.commit();
+        Prefs.clear();
         this.status = false;
         this.usuario = null;
 
@@ -274,161 +260,79 @@ public class EntregasApp extends MultiDexApplication {
 
     public void setConfigDb(String nome_db) {
         //Create a object SharedPreferences from getSharedPreferences("name_file",MODE_PRIVATE) of Context
-        SharedPreferences pref;
-        pref = getSharedPreferences("info", MODE_PRIVATE);
-        //Using putXXX - with XXX is type data you want to write like: putString, putInt...   from      Editor object
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("banco_dados",nome_db);
+        Prefs.putString("banco_dados",nome_db);
 
-        //finally, when you are done saving the values, call the commit() method.
-        editor.commit();
     }
 
     public String getConfigDb() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("info",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String db = shared.getString("banco_dados","");
-        //Log.d("Banco Dados",db);
-        return db;
+        return Prefs.getString("banco_dados","");
     }
 
     public void setConfigLogin(String login) {
-        //Create a object SharedPreferences from getSharedPreferences("name_file",MODE_PRIVATE) of Context
-        SharedPreferences pref;
-        pref = getSharedPreferences("info", MODE_PRIVATE);
-        //Using putXXX - with XXX is type data you want to write like: putString, putInt...   from      Editor object
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("login",login);
-
-        //finally, when you are done saving the values, call the commit() method.
-        editor.commit();
+        Prefs.putString("login", login);
     }
 
     public String getConfigLogin() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("info",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String login = shared.getString("login","");
-        //Log.d("Login",login);
-        return login;
+        return Prefs.getString("login","");
     }
 
     public void setConfigStatus(boolean status) {
-        //Create a object SharedPreferences from getSharedPreferences("name_file",MODE_PRIVATE) of Context
-        SharedPreferences pref;
-        pref = getSharedPreferences("info", MODE_PRIVATE);
-        //Using putXXX - with XXX is type data you want to write like: putString, putInt...   from      Editor object
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean("status",status);
-
-        //finally, when you are done saving the values, call the commit() method.
-        editor.commit();
+        Prefs.putBoolean("status",status);
     }
 
     public boolean getConfigStatus() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("info",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean status = shared.getBoolean("status",false);
-        return status;
+        return Prefs.getBoolean("status",false);
     }
 
 
     public boolean getConfigUploadImageMobile() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean r = shared.getBoolean("upload_img_mobile",false);
-        return r;
+        return Prefs.getBoolean("upload_img_mobile",false);
     }
 
     public boolean getConfigUploadOcorrenciaMobile() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean r = shared.getBoolean("upload_oco_mobile",true);
-        return r;
+
+        return Prefs.getBoolean("upload_oco_mobile",true);
     }
 
     public boolean getConfigDownloadMobile() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean r = shared.getBoolean("download_mobile",true);
-        return r;
+        return Prefs.getBoolean("download_mobile",true);
     }
 
     public int getConfigIntervalSync() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String r = shared.getString("interval_sync","5");
-
-        return Integer.valueOf(r);
+        return Prefs.getInt("interval_sync",5);
     }
 
     public int getConfigIntervalTracking() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String r = shared.getString("interval_tracking","2");
-
-        return Integer.valueOf(r);
+        return Prefs.getInt("interval_tracking",2);
     }
 
     public boolean getFiltroOcorrencias() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        Boolean r = shared.getBoolean("filtrar_ocorrencias",true);
 
-        return r;
+        return Prefs.getBoolean("filtrar_ocorrencias",true);
     }
 
 
 
     public int getConfigResolucao() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String r = shared.getString("img_width","1000");
-        return Integer.valueOf(r);
+        return Prefs.getInt("img_width",1000);
     }
 
     public int getConfigCompressao() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        String r = shared.getString("img_compress","75");
-        return Integer.valueOf(r);
+        return Prefs.getInt("img_compress",75);
     }
 
 
 
     public boolean getConfigCanhotoObrigatorio() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean r = shared.getBoolean("scanner_obrigatorio",true);
-        //Log.d("Canhoto obrigatorio",String.valueOf(r));
-        return r;
+        return Prefs.getBoolean("scanner_obrigatorio", true);
     }
 
     public boolean getModoConsulta() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean modoConsulta = shared.getBoolean("modo_consulta",false);
-        return modoConsulta;
+        return Prefs.getBoolean("modo_consulta",false);
     }
 
     public boolean getModoDaltonico() {
-        //get SharedPreferences from getSharedPreferences("name_file", MODE_PRIVATE)
-        SharedPreferences shared = getSharedPreferences("br.eti.softlog.softlogtmsentregas_preferences",MODE_PRIVATE);
-        //Using getXXX- with XX is type date you wrote to file "name_file"
-        boolean modoDaltonico = shared.getBoolean("modo_daltonico",false);
-        return modoDaltonico;
+        return Prefs.getBoolean("modo_daltonico",false);
     }
 
     public boolean backupBD(Context context, String nome_bd) {

@@ -13,24 +13,6 @@
         android:background="@color/subtitle_background"
         android:layout_weight="0.01" />
 
-    <TextView
-        android:id="@+id/txtDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/subtitle_background"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center_horizontal" />
-
-    <TextView
-        android:id="@+id/txtUsuario"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:background="@color/subtitle_background"
-        android:gravity="center_horizontal" />
-
     <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/pbMain"
         android:layout_width="match_parent"

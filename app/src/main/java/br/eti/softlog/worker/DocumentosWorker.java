@@ -53,7 +53,7 @@ public class DocumentosWorker extends Worker {
         String cpf = myapp.getUsuario().getCpf();
 
         String uuid = myapp.getUsuario().getUuid();
-        String url = "http://api.softlog.eti.br/api/softlog/romaneio_v2/" + codigo_acesso +
+        String url = "http://api.softlog.eti.br/api/softlog/romaneio_v4/" + codigo_acesso +
                 "/" + data + "/" +  uuid + "/" + manager.getUltimaAlteracaoRomaneio(data);
 
         Log.d("WorkManager", url);

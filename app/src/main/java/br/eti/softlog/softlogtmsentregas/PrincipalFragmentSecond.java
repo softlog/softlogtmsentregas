@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -42,13 +41,9 @@ public class PrincipalFragmentSecond extends Fragment {
         lista_entregas.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         lista_entregas.setLayoutManager(layoutManager);
-        lista_entregas.setAdapter(((PrincipalDraweActivity) activity).adapterView);
+        lista_entregas.setAdapter(((PrincipalDraweActivity) activity).adapterView2);
 
         return view;
-
-
-
-
 
 
     }
